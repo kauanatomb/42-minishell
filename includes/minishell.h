@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,35 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#ifndef MINISHELL_H
+# define MINISHELL_H
 
-int read_line(t_shell *shell)
+# include "libft.h"
+# include <readline/readline.h>
+# include <readline/history.h>
+
+typedef struct s_shell
 {
-    char *line;
+    int     error;
+}    t_shell;
 
-    rl_on_new_line(); // Prepare readline for new input
-    line = readline("minishell> ");
-    if (!line)
-    {
-        // free args from shell
-        rl_clear_history(); // Clear previous history
-        return (1); // Exit on EOF
-    }
-    return (1);
-}
-
-int main(int argc, char *argv[], char **envp)
-{
-    t_shell shell;
-
-	if (argc != 1)
-        return (1);
-    init_shell(&shell, envp);
-    shell.error = 0;
-    signal_receiver();
-    while (1)
-        read_line(&shell);
-    rl_clear_history();
-    (void)argv;
-    return (0);
-}
+#endif
