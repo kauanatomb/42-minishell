@@ -12,27 +12,32 @@
 
 NAME    := minishell
 
-SRCS     := main.c
+SRCS     := src/main.c
 
 OBJS     := $(SRCS:.c=.o)
 
 CC      := cc
 CFLAGS  := -Wall -Wextra -Werror
-INCLUDES := -Iincludes
+INCLUDES := -Iincludes -Ilibft
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+$(NAME): $(OBJS) libft/libft.a
+	$(CC) $(CFLAGS) $(OBJS) -Llibft -o $(NAME)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
+libft/libft.a:
+	make -C libft
+
 clean:
 	rm -f $(OBJS)
+	make -C libft clean
 
 fclean: clean
 	rm -f $(NAME)
+	make -C libft fclean
 
 re: fclean all
 
