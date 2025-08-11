@@ -16,6 +16,8 @@
 # include "libft.h"
 # include <readline/readline.h>
 # include <readline/history.h>
+# include <stdbool.h>
+# include <unistd.h>
 
 typedef struct s_shell
 {

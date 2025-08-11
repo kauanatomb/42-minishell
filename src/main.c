@@ -12,11 +12,20 @@
 
 #include "minishell.h"
 
+void    clean_all_fds(void)
+{
+    int i;
+
+    i = 3;
+    while (i < 1024)
+        close(i++);
+}
+
 int exit_ctrld(t_shell *shell)
 {
     (void)shell;
     write(STDIN_FILENO, "exit\n", 5);
-    ft_clean_fd(0);
+    clean_all_fds();
     exit(0);
 }
 
@@ -41,6 +50,11 @@ int verify_line(char *line)
         return (1);
     }
     return (0);
+}
+
+int ft_isspace(char c)
+{
+    return ((c >= 9 && c <= 13) || c == ' ');
 }
 
 int empty_line(char *line)
@@ -101,7 +115,7 @@ int init_shell(t_shell *shell, char **envp)
 
 void    signal_receiver(void)
 {
-    
+
 }
 
 int main(int argc, char *argv[], char **envp)
