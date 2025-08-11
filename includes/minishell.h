@@ -20,6 +20,8 @@
 typedef struct s_shell
 {
     int     error;
+    int     path_flag;
+    char    **env;
 }    t_shell;
 
 #endif
