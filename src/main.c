@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-void	clean_all_fds(void)
+void	clean_extra_fds(void)
 {
 	int	i;
 
@@ -23,13 +23,13 @@ void	clean_all_fds(void)
 
 int	exit_ctrld(t_shell *shell)
 {
-	(void)shell;
+	free_shell_resources(shell); // implement
 	write(STDIN_FILENO, "exit\n", 5);
-	clean_all_fds();
+	clean_extra_fds();
 	exit(0);
 }
 
-int	verify_line(char *line)
+int	has_unclosed_quotes(char *line)
 {
 	bool	single_q;
 	bool	double_q;
@@ -57,20 +57,20 @@ int	ft_isspace(char c)
 	return ((c >= 9 && c <= 13) || c == ' ');
 }
 
-int	empty_line(char *line)
+int	is_line_empty(char *line)
 {
 	int	i;
 
 	if (!line || !*line)
-		return (0);
+		return (1);
 	i = 0;
 	while (line[i])
 	{
 		if (!ft_isspace(line[i]))
-			return (1);
+			return (0);
 		i++;
 	}
-	return (0);
+	return (1);
 }
 
 int	read_line(t_shell *shell)
@@ -81,11 +81,10 @@ int	read_line(t_shell *shell)
 	line = readline("minishell> ");
 	if (!line)
 	{
-		// free args from shell
 		rl_clear_history(); // Clear previous history
 		exit_ctrld(shell);
 	}
-	if (verify_line(line) || empty_line(line))
+	if (has_unclosed_quotes(line) || is_line_empty(line))
 		return (free(line), 0);
 	add_history(line);
 	return (1);
