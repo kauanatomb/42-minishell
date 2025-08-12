@@ -18,6 +18,8 @@
 # include <readline/history.h>
 # include <stdbool.h>
 # include <unistd.h>
+# include <signal.h>
+# include <stdio.h>
 
 typedef struct s_shell
 {
@@ -25,5 +27,14 @@ typedef struct s_shell
 	int		path_flag;
 	char	**env;
 }	t_shell;
+
+// Shell struct
+int	init_shell_env(t_shell *shell, char **envp);
+
+// Signal
+void	signal_receiver(void);
+
+// Global
+extern volatile sig_atomic_t	g_signal;
 
 #endif

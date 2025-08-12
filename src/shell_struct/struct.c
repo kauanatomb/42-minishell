@@ -1,0 +1,96 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   struct.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/11 10:32:28 by ktombola          #+#    #+#             */
+/*   Updated: 2025/08/12 10:55:19 by ktombola         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
+
+static int	ft_array_len(char **arr)
+{
+	int	size;
+
+	size = 0;
+	while (arr && arr[size])
+		size++;
+	return (size);
+}
+
+static char	*build_env(const char *key, const char *value)
+{
+	char	*entry;
+	char	*tmp;
+
+	if (!key || !value)
+		return (NULL);
+	tmp = ft_strjoin(key, "=");
+	if (!tmp)
+		return (NULL);
+	entry = ft_strjoin(tmp, value);
+	free(tmp);
+	if (!entry)
+		return (NULL);
+	return (entry);
+}
+
+static int	create_minimal_env(char **env)
+{
+	char	cwd[1000];
+
+	getcwd(cwd, sizeof(cwd));
+	env[0] = build_env("PWD", cwd);
+	if (!env[0])
+		return (free(env), 137);
+	env[1] = build_env("OLDPWD", cwd);
+	if (!env[1])
+		return (ft_free_array(env), 137); // ft_free_array implement!!!
+	env[2] = ft_strdup("_=/usr/bin/env");
+	if (!env[2])
+		return (ft_free_array(env), 137);
+	env[3] = NULL;
+	return (0);
+}
+
+static int	copy_envp_to_shell(char **env, char **envp)
+{
+	int	i;
+
+	i = 0;
+	while (envp[i])
+	{
+		env[i] = ft_strdup(envp[i]);
+		if (!env[i])
+			return (137);
+		i++;
+	}
+	env[i] = NULL;
+	return (0);
+}
+
+int	init_shell_env(t_shell *shell, char **envp)
+{
+	if (ft_array_len(envp) == 0)
+	{
+		shell->env = malloc(sizeof(char *) * 4);
+		if (!shell->env)
+			return (137);
+		if (create_minimal_env(shell->env))
+			return (137);
+	}
+	else
+	{
+		shell->env = malloc(sizeof(char *) * ft_array_len(envp) + 1);
+		if (!shell->env)
+			return (137);
+		if (copy_envp_to_shell(shell->env, envp))
+			return (137);
+	}
+	shell->path_flag = 0;
+	return (0);
+}

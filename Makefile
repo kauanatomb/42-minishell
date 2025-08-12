@@ -12,7 +12,7 @@
 
 NAME    := minishell
 
-SRCS     := src/main.c
+SRCS     := src/main.c src/shell_struct/struct.c src/signal/handler.c
 
 OBJS     := $(SRCS:.c=.o)
 

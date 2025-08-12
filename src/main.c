@@ -12,6 +12,8 @@
 
 #include "minishell.h"
 
+volatile sig_atomic_t	g_signal = 0;
+
 void	clean_extra_fds(void)
 {
 	int	i;
@@ -21,9 +23,32 @@ void	clean_extra_fds(void)
 		close(i++);
 }
 
+void	free_shell_env(char **env)
+{
+	int	i;
+
+	if (!env)
+	{
+		perror("Nothing to free\n");
+		return ;
+	}
+	i = 0;
+	if (!env[i])
+	{
+		free(env);
+		return ;
+	}
+	if (env[i])
+	{
+		while (env[i])
+			free(env[i++]);
+		free(env);
+	}
+}
+
 int	exit_ctrld(t_shell *shell)
 {
-	free_shell_resources(shell); // implement
+	free_shell_env(shell->env);
 	write(STDIN_FILENO, "exit\n", 5);
 	clean_extra_fds();
 	exit(0);
@@ -46,7 +71,7 @@ int	has_unclosed_quotes(char *line)
 	}
 	if (single_q || double_q)
 	{
-		write(STDERR_FILENO, "unclosed quotes\n", 17);
+		perror("unclosed quotes\n");
 		return (1);
 	}
 	return (0);
@@ -87,43 +112,24 @@ int	read_line(t_shell *shell)
 	if (has_unclosed_quotes(line) || is_line_empty(line))
 		return (free(line), 0);
 	add_history(line);
-	return (1);
+	// shell->error = check_entry(shell, line); //create function check entry
+	// if (sell->error)
+	// 	return (free(line), 0);
+	// check_redir(shell) // create function + understand
+	// ft_manage_execution(shell); // create function + understand
+	// free_cmd_list(shell->cmds); // create function + understand
+	// ft_free_tokens(shell->tokens); // create function + understand
+	clean_extra_fds();
+	return (free(line), 1);
 }
 
-int	init_shell(t_shell *shell, char **envp)
-{
-	if (/*function to count array len */)
-	{
-		shell->env = malloc(sizeof(char *) * 4);
-		if (!shell->env)
-			return (137);
-		if (/*call function to create env, if fail return*/)
-			return (137);
-	}
-	else
-	{
-		shell->env = malloc(sizeof(char *) * /*function t count array len*/ + 1);
-		if (!shell->env)
-			return (137);
-		if (/*call function to create env, if fail return*/)
-			return (137);
-	}
-	shell->path_flag = 0;
-	return (0);
-}
-
-void	signal_receiver(void)
-{
-	
-}
-
-int	main(int argc, char *argv[], char **envp)
+int	main(int argc, char *argv[], char *envp[])
 {
 	t_shell	shell;
 
 	if (argc != 1)
 		return (1);
-	init_shell(&shell, envp);
+	init_shell_env(&shell, envp);
 	shell.error = 0;
 	signal_receiver();
 	while (1)
