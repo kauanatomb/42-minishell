@@ -120,7 +120,7 @@ int	main(int argc, char *argv[], char *envp[])
 		return (1);
 	init_shell_env(&shell, envp);
 	shell.error = 0;
-	// signal_receiver();
+	signal_receiver();
 	while (1)
 		read_line(&shell);
 	rl_clear_history();
