@@ -12,7 +12,8 @@
 
 NAME    := minishell
 
-SRCS     := src/main.c src/shell_struct/struct.c src/signal/handler.c
+SRCS     := src/main.c src/shell_struct/struct.c 
+# src/signal/handler.c
 
 OBJS     := $(SRCS:.c=.o)
 
@@ -23,7 +24,7 @@ INCLUDES := -Iincludes -Ilibft
 all: $(NAME)
 
 $(NAME): $(OBJS) libft/libft.a
-	$(CC) $(CFLAGS) $(OBJS) -Llibft -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJS) -Llibft -lft -lreadline -o $(NAME)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@

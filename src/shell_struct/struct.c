@@ -39,17 +39,30 @@ static char	*build_env(const char *key, const char *value)
 	return (entry);
 }
 
+void	ft_free_array(char **dest)
+{
+	int	i;
+
+	i = 0;
+	if (!dest)
+		return ;
+	while (dest[i])
+		free(dest[i++]);
+	free(dest);
+}
+
 static int	create_minimal_env(char **env)
 {
 	char	cwd[1000];
 
-	getcwd(cwd, sizeof(cwd));
+	if (!getcwd(cwd, sizeof(cwd)))
+		return (free(env), 137);
 	env[0] = build_env("PWD", cwd);
 	if (!env[0])
 		return (free(env), 137);
 	env[1] = build_env("OLDPWD", cwd);
 	if (!env[1])
-		return (ft_free_array(env), 137); // ft_free_array implement!!!
+		return (ft_free_array(env), 137);
 	env[2] = ft_strdup("_=/usr/bin/env");
 	if (!env[2])
 		return (ft_free_array(env), 137);
@@ -66,7 +79,11 @@ static int	copy_envp_to_shell(char **env, char **envp)
 	{
 		env[i] = ft_strdup(envp[i]);
 		if (!env[i])
+		{
+			env[i] = NULL;
+			ft_free_array(env);
 			return (137);
+		}
 		i++;
 	}
 	env[i] = NULL;
@@ -85,7 +102,7 @@ int	init_shell_env(t_shell *shell, char **envp)
 	}
 	else
 	{
-		shell->env = malloc(sizeof(char *) * ft_array_len(envp) + 1);
+		shell->env = malloc(sizeof(char *) * (ft_array_len(envp) + 1));
 		if (!shell->env)
 			return (137);
 		if (copy_envp_to_shell(shell->env, envp))

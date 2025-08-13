@@ -28,22 +28,11 @@ void	free_shell_env(char **env)
 	int	i;
 
 	if (!env)
-	{
-		perror("Nothing to free\n");
 		return ;
-	}
 	i = 0;
-	if (!env[i])
-	{
-		free(env);
-		return ;
-	}
-	if (env[i])
-	{
-		while (env[i])
-			free(env[i++]);
-		free(env);
-	}
+	while (env[i])
+		free(env[i++]);
+	free(env);
 }
 
 int	exit_ctrld(t_shell *shell)
@@ -131,7 +120,7 @@ int	main(int argc, char *argv[], char *envp[])
 		return (1);
 	init_shell_env(&shell, envp);
 	shell.error = 0;
-	signal_receiver();
+	// signal_receiver();
 	while (1)
 		read_line(&shell);
 	rl_clear_history();
