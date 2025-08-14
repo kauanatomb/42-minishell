@@ -43,7 +43,7 @@ int	exit_ctrld(t_shell *shell)
 	exit(0);
 }
 
-int	has_unclosed_quotes(char *line)
+bool	has_unclosed_quotes(char *line)
 {
 	bool	single_q;
 	bool	double_q;
@@ -61,9 +61,9 @@ int	has_unclosed_quotes(char *line)
 	if (single_q || double_q)
 	{
 		write(2, "unclosed quotes\n", 16);
-		return (1);
+		return (true);
 	}
-	return (0);
+	return (false);
 }
 
 int	ft_isspace(char c)
@@ -71,20 +71,20 @@ int	ft_isspace(char c)
 	return ((c >= 9 && c <= 13) || c == ' ');
 }
 
-int	is_line_empty(char *line)
+bool	is_line_empty(char *line)
 {
 	int	i;
 
 	if (!line || !*line)
-		return (1);
+		return (true);
 	i = 0;
 	while (line[i])
 	{
 		if (!ft_isspace(line[i]))
-			return (0);
+			return (false);
 		i++;
 	}
-	return (1);
+	return (true);
 }
 
 int	check_entry(t_shell *shell, char *line)
