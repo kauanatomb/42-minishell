@@ -38,7 +38,7 @@ void	signal_receiver(void)
 	sa_slash.sa_flags = 0;
 	if (sigaction(SIGQUIT, &sa_slash, NULL) == -1)
 	{
-		perror("Sigaction failed\n");
+		write(2, "Sigaction failed\n", 17);
 		exit(EXIT_FAILURE);
 	}
 	sa_c.sa_handler = handle_sig;
@@ -46,7 +46,7 @@ void	signal_receiver(void)
 	sa_c.sa_flags = 0;
 	if (sigaction(SIGINT, &sa_c, NULL) == -1)
 	{
-		perror("Sigaction failed\n");
+		write(2, "Sigaction failed\n", 17);
 		exit(EXIT_FAILURE);
 	}
 }

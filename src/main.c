@@ -60,7 +60,7 @@ int	has_unclosed_quotes(char *line)
 	}
 	if (single_q || double_q)
 	{
-		perror("unclosed quotes\n");
+		write(2, "unclosed quotes\n", 16);
 		return (1);
 	}
 	return (0);
