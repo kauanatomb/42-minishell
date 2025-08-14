@@ -87,6 +87,27 @@ int	is_line_empty(char *line)
 	return (1);
 }
 
+int	check_entry(t_shell *shell, char *line)
+{
+	int	ret;
+
+	ret = lexer(shell, line);
+	if (ret != 0)
+		return (ret);
+	// ret = parse(shell);
+	// if (ret != 0)
+	// 	return (free_cmd_list(shell->cmds), free_cmd_list(shell->cmds), ret);
+	// if (g_signal == 130)
+	// {
+	// 	shell->error = 130;
+	// 	g_signal = 0;
+	// }
+	// ret = main_expand(shell);
+	// if (ret != 0)
+	// 	return (free_cmd_list(shell->cmds), free_cmd_list(shell->cmds), ret);
+	// return (0);
+}
+
 int	read_line(t_shell *shell)
 {
 	char	*line;
@@ -101,13 +122,10 @@ int	read_line(t_shell *shell)
 	if (has_unclosed_quotes(line) || is_line_empty(line))
 		return (free(line), 0);
 	add_history(line);
-	// shell->error = check_entry(shell, line); //create function check entry
-	// if (sell->error)
-	// 	return (free(line), 0);
-	// check_redir(shell) // create function + understand
-	// ft_manage_execution(shell); // create function + understand
-	// free_cmd_list(shell->cmds); // create function + understand
-	// ft_free_tokens(shell->tokens); // create function + understand
+	shell->error = check_entry(shell, line);
+	if (sell->error)
+		return (free(line), 0);
+	// more steps: execution and clean
 	clean_extra_fds();
 	return (free(line), 1);
 }

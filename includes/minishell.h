@@ -21,11 +21,18 @@
 # include <signal.h>
 # include <stdio.h>
 
+typedef struct	s_token
+{
+	char	**l_tokens;
+	char	**l_types;
+}			t_token;
+
 typedef struct s_shell
 {
 	int		error;
 	int		path_flag;
 	char	**env;
+	t_token	*tokens;
 }	t_shell;
 
 // Shell struct
