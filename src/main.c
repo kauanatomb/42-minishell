@@ -91,9 +91,22 @@ int	check_entry(t_shell *shell, char *line)
 {
 	int	ret;
 
-	ret = lexer(shell, line);
+	ret = lex_line(shell, line);
 	if (ret != 0)
 		return (ret);
+	int i = 0;
+	if (!shell->tokens)
+	{
+		printf("shell->tokens é NULL!\n");
+		return 1;
+	}
+	while (shell->tokens[i].value)
+	{
+		printf("Token[%d]: '%s', Type: %d\n", i, shell->tokens[i].value, shell->tokens[i].type);
+		i++;
+	}
+	printf("Total tokens: %d\n", i);
+
 	// ret = parse(shell);
 	// if (ret != 0)
 	// 	return (free_cmd_list(shell->cmds), free_cmd_list(shell->cmds), ret);
@@ -105,7 +118,7 @@ int	check_entry(t_shell *shell, char *line)
 	// ret = main_expand(shell);
 	// if (ret != 0)
 	// 	return (free_cmd_list(shell->cmds), free_cmd_list(shell->cmds), ret);
-	// return (0);
+	return (0);
 }
 
 int	read_line(t_shell *shell)
@@ -123,7 +136,7 @@ int	read_line(t_shell *shell)
 		return (free(line), 0);
 	add_history(line);
 	shell->error = check_entry(shell, line);
-	if (sell->error)
+	if (shell->error)
 		return (free(line), 0);
 	// more steps: execution and clean
 	clean_extra_fds();

@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,18 +12,70 @@
 
 #include "minishell.h"
 
-int lexer(t_shell *shell, char *line)
+void skip_operator(const char *line, int *i)
 {
-    shell->tokens = malloc(sizeof(t_token));
+    if ((line[*i] == '<' && line[*i + 1] == '<') ||
+        (line[*i] == '>' && line[*i + 1] == '>'))
+        *i += 2;
+    else
+        (*i)++;
+}
+
+int ft_is_operator(char c)
+{
+    return (c == '|' || c == '<' || c == '>' || c == '&');
+}
+
+void skip_word(const char *line, int *i)
+{
+    char    quote;
+
+    while (line[*i] && !ft_isspace(line[*i]) && !ft_is_operator(line[*i]))
+    {
+        if (line[*i] == '\'' || line[*i] == '"')
+        {
+            quote = line[(*i)++];
+            while (line[*i] && line[*i] != quote)
+                (*i)++;
+            if (line[*i] == quote)
+                (*i)++;
+        }
+        else
+            (*i)++;
+    }
+}
+
+static int count_tokens(const char *line)
+{
+    int i = 0, count = 0;
+    while (line[i])
+    {
+        if (ft_isspace(line[i]))
+            i++;
+        else if (ft_is_operator(line[i]))
+        {
+            skip_operator(line, &i);
+            count++;
+        }
+        else
+        {
+            skip_word(line, &i);
+            count++;
+        }
+    }
+    return count;
+}
+
+int lex_line(t_shell *shell, const char *line)
+{
+    int token_count;
+
+    token_count = count_tokens(line);
+    shell->num_tokens = token_count;
+    shell->tokens = malloc(sizeof(t_token) * (token_count + 1));
     if (!shell->tokens)
-        return (137);
-    shell->tokens->l_tokens = split_custom(line); // implem function: array of all possible tokens
-    if (!shell->tokens->l_tokens)
-        return (137);
-    shell->tokens->l_types = malloc(sizeof(char *)
-            * (ft_array_len(shell->tokens->l_tokens) + 3));
-    if (!shell->tokens->l_types)
-        return (ft_free_array(shell->tokens->l_tokens), free(shell->tokens), 137)
-    if (give_types(shell)) // implem function: save types of tokens
-        return (ft_free_tokens(shell->tok), 137); //implem function free just tokens
+        return (1);
+    if (tokenize_all(shell, line))
+        return (1);
+    return (0);
 }
