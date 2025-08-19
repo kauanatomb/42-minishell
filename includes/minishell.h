@@ -45,12 +45,22 @@ typedef struct	s_token
 	t_quote_type	quote_type;
 }			t_token;
 
+typedef struct s_cmd
+{
+    char    **argv; // WORDs
+    char    *infile; // if <
+    char    *outfile; // if > or >>
+    int     append;      // 1 if ">>", 0 if ">"
+    struct s_cmd *next;  // next if pipes
+}   t_cmd;
+
 typedef struct s_shell
 {
 	int		error;
 	int		path_flag;
 	char	**env;
 	t_token	*tokens;
+	t_cmd	*cmds;
 	int		num_tokens;
 }	t_shell;
 

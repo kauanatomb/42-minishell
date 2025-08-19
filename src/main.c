@@ -97,7 +97,7 @@ int	check_entry(t_shell *shell, char *line)
 	int i = 0;
 	if (!shell->tokens)
 	{
-		printf("shell->tokens é NULL!\n");
+		printf("shell->tokens is NULL!\n");
 		return 1;
 	}
 	while (shell->tokens[i].value)
@@ -107,17 +107,10 @@ int	check_entry(t_shell *shell, char *line)
 	}
 	printf("Total tokens: %d\n", i);
 
-	// ret = parse(shell);
-	// if (ret != 0)
-	// 	return (free_cmd_list(shell->cmds), free_cmd_list(shell->cmds), ret);
-	// if (g_signal == 130)
-	// {
-	// 	shell->error = 130;
-	// 	g_signal = 0;
-	// }
-	// ret = main_expand(shell);
-	// if (ret != 0)
-	// 	return (free_cmd_list(shell->cmds), free_cmd_list(shell->cmds), ret);
+	ret = parse(shell);
+	if (ret != 0)
+	 	return (free_cmd_list(shell->cmds), ret);
+	// more steps: handle signal g_signal and expand
 	return (0);
 }
 
