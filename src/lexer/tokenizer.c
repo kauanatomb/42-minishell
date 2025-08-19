@@ -12,19 +12,37 @@
 
 #include "minishell.h"
 
-void ft_free_tokens(t_token *tokens)
+void skip_operator(const char *line, int *i)
 {
-    int i;
+    if ((line[*i] == '<' && line[*i + 1] == '<') ||
+        (line[*i] == '>' && line[*i + 1] == '>'))
+        *i += 2;
+    else
+        (*i)++;
+}
 
-    if (!tokens)
-        return ;
-    i = 0;
-    while (tokens[i].value)
+int ft_is_operator(char c)
+{
+    return (c == '|' || c == '<' || c == '>' || c == '&');
+}
+
+void skip_word(const char *line, int *i)
+{
+    char    quote;
+
+    while (line[*i] && !ft_isspace(line[*i]) && !ft_is_operator(line[*i]))
     {
-        free(tokens[i].value);
-        i++;
+        if (line[*i] == '\'' || line[*i] == '"')
+        {
+            quote = line[(*i)++];
+            while (line[*i] && line[*i] != quote)
+                (*i)++;
+            if (line[*i] == quote)
+                (*i)++;
+        }
+        else
+            (*i)++;
     }
-    free(tokens);
 }
 
 static t_token_type classify_operator(const char *s, int len)
@@ -40,19 +58,6 @@ static t_token_type classify_operator(const char *s, int len)
     if (len == 2 && s[0] == '<' && s[1] == '<')
         return HEREDOC;
     return WORD;
-}
-
-char *ft_strndup(const char *s, size_t n)
-{
-    char *dup;
-
-    if (!s)
-        return NULL;
-    dup = malloc(n + 1);
-    if (!dup)
-        return NULL;
-    ft_strlcpy(dup, s, n + 1);
-    return dup;
 }
 
 int tokenize_all(t_shell *shell, const char *line)
@@ -78,10 +83,7 @@ int tokenize_all(t_shell *shell, const char *line)
             len = i - start;
             shell->tokens[j].value = ft_strndup(&line[start], len);
             if (!shell->tokens[j].value)
-            {
-                ft_free_tokens(shell->tokens);
                 return (1);
-            }
             if (ft_is_operator(shell->tokens[j].value[0]))
                 shell->tokens[j].type = classify_operator(shell->tokens[j].value, len);
             else

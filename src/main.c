@@ -52,9 +52,9 @@ bool	has_unclosed_quotes(char *line)
 	double_q = false;
 	while (*line)
 	{
-		if (*line == '\'')
+		if (*line == '\'' && !double_q)
 			single_q = !single_q;
-		else if (*line == '\"')
+		else if (*line == '\"' && !single_q)
 			double_q = !double_q;
 		line++;
 	}
@@ -102,7 +102,7 @@ int	check_entry(t_shell *shell, char *line)
 	}
 	while (shell->tokens[i].value)
 	{
-		printf("Token[%d]: '%s', Type: %d\n", i, shell->tokens[i].value, shell->tokens[i].type);
+		printf("Token[%d]: %s, Type: %d, Type quote: %d\n", i, shell->tokens[i].value, shell->tokens[i].type, shell->tokens[i].quote_type);
 		i++;
 	}
 	printf("Total tokens: %d\n", i);

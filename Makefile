@@ -13,7 +13,7 @@
 NAME    := minishell
 
 SRCS     := src/main.c src/shell_struct/struct.c src/signal/handler.c \
-		   	src/lexer/lexer.c src/lexer/tokenizer.c \
+		   	src/lexer/lexer.c src/lexer/tokenizer.c src/lexer/lexer_utils.c\
 
 OBJS     := $(SRCS:.c=.o)
 

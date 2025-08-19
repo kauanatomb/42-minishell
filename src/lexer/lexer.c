@@ -12,39 +12,6 @@
 
 #include "minishell.h"
 
-void skip_operator(const char *line, int *i)
-{
-    if ((line[*i] == '<' && line[*i + 1] == '<') ||
-        (line[*i] == '>' && line[*i + 1] == '>'))
-        *i += 2;
-    else
-        (*i)++;
-}
-
-int ft_is_operator(char c)
-{
-    return (c == '|' || c == '<' || c == '>' || c == '&');
-}
-
-void skip_word(const char *line, int *i)
-{
-    char    quote;
-
-    while (line[*i] && !ft_isspace(line[*i]) && !ft_is_operator(line[*i]))
-    {
-        if (line[*i] == '\'' || line[*i] == '"')
-        {
-            quote = line[(*i)++];
-            while (line[*i] && line[*i] != quote)
-                (*i)++;
-            if (line[*i] == quote)
-                (*i)++;
-        }
-        else
-            (*i)++;
-    }
-}
-
 static int count_tokens(const char *line)
 {
     int i = 0, count = 0;
@@ -66,6 +33,46 @@ static int count_tokens(const char *line)
     return count;
 }
 
+static char    *strip_quotes(const char *src, int *quote_type)
+{
+    size_t len;
+    
+    len = ft_strlen(src);
+    if (quote_type)
+        *quote_type = 0;
+    if (len >= 2 &&
+        ((src[0] == '\'' && src[len - 1] == '\'') ||
+        (src[0] == '"'  && src[len - 1] == '"')))
+    {
+        if (quote_type && src[0] == '\'')
+            *quote_type = 1;
+        else
+            *quote_type = 2; // 1=single, 2=double
+        return (ft_substr(src, 1, len - 2));
+    }
+    return (ft_strdup(src));
+}
+
+static int normalize_tokens(t_shell *shell)
+{
+    int i;
+    char *clean;
+    int quote_type;
+
+    i = 0;
+    while (shell->tokens[i].value)
+    {
+        clean = strip_quotes(shell->tokens[i].value, &quote_type);
+        if (!clean)
+            return (1);
+        free(shell->tokens[i].value);
+        shell->tokens[i].value = clean;
+        shell->tokens[i].quote_type = quote_type;
+        i++;
+    }
+    return (0);
+}
+
 int lex_line(t_shell *shell, const char *line)
 {
     int token_count;
@@ -75,7 +82,10 @@ int lex_line(t_shell *shell, const char *line)
     shell->tokens = malloc(sizeof(t_token) * (token_count + 1));
     if (!shell->tokens)
         return (1);
-    if (tokenize_all(shell, line))
+    if (tokenize_all(shell, line) || normalize_tokens(shell))
+    {
+        ft_free_tokens(shell->tokens);
         return (1);
+    }
     return (0);
 }

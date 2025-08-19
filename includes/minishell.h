@@ -21,6 +21,13 @@
 # include <unistd.h>
 # include <signal.h>
 
+typedef enum e_quote_type
+{
+	NONE,
+	SINGLE,
+	DOUBLE,
+}	t_quote_type;
+
 typedef enum e_token_type
 {
 	WORD,
@@ -35,6 +42,7 @@ typedef struct	s_token
 {
 	char			*value;
 	t_token_type	type;
+	t_quote_type	quote_type;
 }			t_token;
 
 typedef struct s_shell
@@ -60,9 +68,10 @@ int lex_line(t_shell *shell, const char *line);
 void skip_operator(const char *line, int *i);
 int ft_is_operator(char c);
 void skip_word(const char *line, int *i);
-// Tokenizer
+
 int tokenize_all(t_shell *shell, const char *line);
 void ft_free_tokens(t_token *tokens);
+char *ft_strndup(const char *s, size_t n);
 
 // Global
 extern volatile sig_atomic_t	g_signal;
