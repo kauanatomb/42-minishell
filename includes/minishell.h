@@ -44,7 +44,7 @@ typedef struct	s_token
 	t_token_type	type;
 	t_quote_type	quote_type;
 }			t_token;
-
+// at the moment im not dealing with heredoc
 typedef struct s_cmd
 {
     char    **argv; // WORDs
