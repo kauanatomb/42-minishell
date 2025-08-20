@@ -110,6 +110,24 @@ int	check_entry(t_shell *shell, char *line)
 		// free_cmd_list(shell->cmds)
 		return (ERR_PARSE);
 	}
+	if (!shell->cmds)
+		return (ERR_LEX);
+	i = 0;
+	int j;
+	t_cmd *curr = shell->cmds;
+	while (curr)
+	{
+		j = 0;
+		printf("Command[%d]: infile: %s, outfile: %s, append: %d, ", i, curr->infile, curr->outfile, curr->append);
+		while (curr->argv[j])
+		{
+			printf("argv list: %s\n", curr->argv[j]);
+			j++;
+		}
+		i++;
+		curr = curr->next;
+	}
+	printf("Total cmd: %d\n", i);
 	// more steps: handle signal g_signal and expand
 	return (0);
 }

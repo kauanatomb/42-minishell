@@ -91,6 +91,9 @@ int tokenize_all(t_shell *shell, const char *line);
 void ft_free_tokens(t_token *tokens);
 char *ft_strndup(const char *s, size_t n);
 
+// PARSE
+int parse(t_shell *shell);
+
 // Global
 extern volatile sig_atomic_t	g_signal;
 
