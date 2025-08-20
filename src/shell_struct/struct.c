@@ -67,7 +67,7 @@ static int	create_minimal_env(char **env)
 	if (!env[2])
 		return (ft_free_array(env), 137);
 	env[3] = NULL;
-	return (0);
+	return (ERR_NONE);
 }
 
 static int	copy_envp_to_shell(char **env, char **envp)
@@ -87,7 +87,7 @@ static int	copy_envp_to_shell(char **env, char **envp)
 		i++;
 	}
 	env[i] = NULL;
-	return (0);
+	return (ERR_NONE);
 }
 
 int	init_shell_env(t_shell *shell, char **envp)
@@ -109,5 +109,5 @@ int	init_shell_env(t_shell *shell, char **envp)
 			return (137);
 	}
 	shell->path_flag = 0;
-	return (0);
+	return (ERR_NONE);
 }

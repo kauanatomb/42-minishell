@@ -83,7 +83,7 @@ int tokenize_all(t_shell *shell, const char *line)
             len = i - start;
             shell->tokens[j].value = ft_strndup(&line[start], len);
             if (!shell->tokens[j].value)
-                return (1);
+                return (ERR_LEX);
             if (ft_is_operator(shell->tokens[j].value[0]))
                 shell->tokens[j].type = classify_operator(shell->tokens[j].value, len);
             else
@@ -93,5 +93,5 @@ int tokenize_all(t_shell *shell, const char *line)
     }
     shell->tokens[j].value = NULL;
     shell->tokens[j].type = -1;
-    return (0);
+    return (ERR_NONE);
 }

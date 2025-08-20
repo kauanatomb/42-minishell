@@ -30,7 +30,7 @@ static int count_tokens(const char *line)
             count++;
         }
     }
-    return count;
+    return (count);
 }
 
 static char    *strip_quotes(const char *src, int *quote_type)
@@ -64,13 +64,13 @@ static int normalize_tokens(t_shell *shell)
     {
         clean = strip_quotes(shell->tokens[i].value, &quote_type);
         if (!clean)
-            return (1);
+            return (ERR_LEX);
         free(shell->tokens[i].value);
         shell->tokens[i].value = clean;
         shell->tokens[i].quote_type = quote_type;
         i++;
     }
-    return (0);
+    return (ERR_NONE);
 }
 
 int lex_line(t_shell *shell, const char *line)
@@ -81,11 +81,11 @@ int lex_line(t_shell *shell, const char *line)
     shell->num_tokens = token_count;
     shell->tokens = malloc(sizeof(t_token) * (token_count + 1));
     if (!shell->tokens)
-        return (1);
+        return (ERR_LEX);
     if (tokenize_all(shell, line) || normalize_tokens(shell))
     {
         ft_free_tokens(shell->tokens);
-        return (1);
+        return (ERR_LEX);
     }
-    return (0);
+    return (ERR_NONE);
 }

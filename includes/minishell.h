@@ -21,6 +21,14 @@
 # include <unistd.h>
 # include <signal.h>
 
+typedef enum e_error
+{
+	ERR_NONE,
+	ERR_LEX,
+	ERR_PARSE,
+	ERR_EXEC,
+}	t_error;
+
 typedef enum e_quote_type
 {
 	NONE,
@@ -47,16 +55,16 @@ typedef struct	s_token
 // at the moment im not dealing with heredoc
 typedef struct s_cmd
 {
-    char    **argv; // WORDs
-    char    *infile; // if <
-    char    *outfile; // if > or >>
-    int     append;      // 1 if ">>", 0 if ">"
-    struct s_cmd *next;  // next if pipes
+	char    **argv; // WORDs
+	char    *infile; // if <
+	char    *outfile; // if > or >>
+	int     append;      // 1 if ">>", 0 if ">"
+	struct s_cmd *next;  // next if pipes
 }   t_cmd;
 
 typedef struct s_shell
 {
-	int		error;
+	t_error	error;
 	int		path_flag;
 	char	**env;
 	t_token	*tokens;

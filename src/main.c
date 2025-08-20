@@ -92,14 +92,11 @@ int	check_entry(t_shell *shell, char *line)
 	int	ret;
 
 	ret = lex_line(shell, line);
-	if (ret != 0)
+	if (ret != ERR_NONE)
 		return (ret);
 	int i = 0;
 	if (!shell->tokens)
-	{
-		printf("shell->tokens is NULL!\n");
-		return 1;
-	}
+		return (ERR_LEX);
 	while (shell->tokens[i].value)
 	{
 		printf("Token[%d]: %s, Type: %d, Type quote: %d\n", i, shell->tokens[i].value, shell->tokens[i].type, shell->tokens[i].quote_type);
@@ -108,8 +105,11 @@ int	check_entry(t_shell *shell, char *line)
 	printf("Total tokens: %d\n", i);
 
 	ret = parse(shell);
-	if (ret != 0)
-	 	return (free_cmd_list(shell->cmds), ret);
+	if (ret != ERR_NONE)
+	{
+		// free_cmd_list(shell->cmds)
+		return (ERR_PARSE);
+	}
 	// more steps: handle signal g_signal and expand
 	return (0);
 }

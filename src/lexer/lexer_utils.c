@@ -32,10 +32,10 @@ char *ft_strndup(const char *s, size_t n)
     char *dup;
 
     if (!s)
-        return NULL;
+        return (NULL);
     dup = malloc(n + 1);
     if (!dup)
-        return NULL;
+        return (NULL);
     ft_strlcpy(dup, s, n + 1);
     return (dup);
 }
