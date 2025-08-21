@@ -30,15 +30,13 @@ int count_words(t_shell *shell, int start)
 t_cmd   *new_cmd(int counted_words)
 {
     t_cmd   *cmd;
-    int     i;
 
     cmd = malloc(sizeof(t_cmd));
-    cmd->argv = malloc(sizeof(char *) * (counted_words + 1));
-    if (!cmd->argv)
+    if (!cmd)
         return (NULL);
-    i = 0;
-    while (i <= counted_words)
-        cmd->argv[i++] = NULL;
+    cmd->argv = calloc(counted_words + 1, sizeof(char *));
+    if (!cmd->argv)
+        return (free(cmd), NULL);
     cmd->infile = NULL;
     cmd->outfile = NULL;
     cmd->append = 0;
@@ -46,8 +44,10 @@ t_cmd   *new_cmd(int counted_words)
     return (cmd);
 }
 // argv ["word1", "word2" ...]
-int add_to_argv(t_cmd *cmd, char *word, int pos)
+int add_to_argv(t_cmd *cmd, char *word, int pos, int max_words)
 {
+    if (pos >= max_words)
+        return (ERR_PARSE);
     cmd->argv[pos] = ft_strdup(word);
     if (!cmd->argv[pos])
         return (ERR_PARSE);
@@ -71,7 +71,7 @@ int parse(t_shell *shell)
     {
         if (shell->tokens[i].type == WORD)
         {
-            add_to_argv(curr, shell->tokens[i].value, start);
+            add_to_argv(curr, shell->tokens[i].value, start, counted_words);
             start++;
         }
         else if (shell->tokens[i].type == INPUT)
@@ -93,9 +93,9 @@ int parse(t_shell *shell)
         else if (shell->tokens[i].type == PIPE)
         {
             if (start == 0 || (shell->tokens[i + 1].type == PIPE)
-                || !shell->tokens[i + 1].value)
+                || i + 1 >= shell->num_tokens)
                 return (ERR_PARSE);
-            curr->next = new_cmd(count_words(shell, i));
+            curr->next = new_cmd(count_words(shell, i + 1));
             if (!curr->next)
                 return (ERR_PARSE);
             curr = curr->next;
