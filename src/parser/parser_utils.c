@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lexer_utils.c                                      :+:      :+:    :+:   */
+/*   parser_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,30 +12,28 @@
 
 #include "minishell.h"
 
-void free_tokens(t_token *tokens)
+void    free_cmd_list(t_cmd *cmds)
 {
-    int i;
+    int     i;
+    t_cmd   *curr;
+    t_cmd   *next;
 
-    if (!tokens)
+    if (!cmds)
         return ;
-    i = 0;
-    while (tokens[i].value)
+    curr = cmds;
+    while (curr)
     {
-        free(tokens[i].value);
-        i++;
+        next = curr->next;
+        if (curr->argv)
+        {
+            i = 0;
+            while (curr->argv[i])
+                free(curr->argv[i++]);
+            free(curr->argv);
+        }
+        free(curr->infile);
+        free(curr->outfile);
+        free(curr);
+        curr = curr->next;
     }
-    free(tokens);
-}
-
-char *ft_strndup(const char *s, size_t n)
-{
-    char *dup;
-
-    if (!s)
-        return (NULL);
-    dup = malloc(n + 1);
-    if (!dup)
-        return (NULL);
-    ft_strlcpy(dup, s, n + 1);
-    return (dup);
 }

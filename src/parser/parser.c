@@ -43,7 +43,7 @@ t_cmd   *new_cmd(int counted_words)
     cmd->next = NULL;
     return (cmd);
 }
-// argv ["word1", "word2" ...]
+
 int add_to_argv(t_cmd *cmd, char *word, int pos, int max_words)
 {
     if (pos >= max_words)

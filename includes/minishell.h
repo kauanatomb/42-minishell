@@ -24,7 +24,7 @@
 typedef enum e_error
 {
 	ERR_NONE,
-	ERR_LEX,
+	ERR_MEMORY,
 	ERR_PARSE,
 	ERR_EXEC,
 }	t_error;
@@ -88,7 +88,7 @@ int ft_is_operator(char c);
 void skip_word(const char *line, int *i);
 
 int tokenize_all(t_shell *shell, const char *line);
-void ft_free_tokens(t_token *tokens);
+void free_tokens(t_token *tokens);
 char *ft_strndup(const char *s, size_t n);
 
 // PARSE

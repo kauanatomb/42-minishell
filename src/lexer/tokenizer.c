@@ -83,7 +83,7 @@ int tokenize_all(t_shell *shell, const char *line)
             len = i - start;
             shell->tokens[j].value = ft_strndup(&line[start], len);
             if (!shell->tokens[j].value)
-                return (ERR_LEX);
+                return (ERR_MEMORY);
             if (ft_is_operator(shell->tokens[j].value[0]))
                 shell->tokens[j].type = classify_operator(shell->tokens[j].value, len);
             else

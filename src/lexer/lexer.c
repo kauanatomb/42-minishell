@@ -64,7 +64,7 @@ static int normalize_tokens(t_shell *shell)
     {
         clean = strip_quotes(shell->tokens[i].value, &quote_type);
         if (!clean)
-            return (ERR_LEX);
+            return (ERR_MEMORY);
         free(shell->tokens[i].value);
         shell->tokens[i].value = clean;
         shell->tokens[i].quote_type = quote_type;
@@ -81,11 +81,11 @@ int lex_line(t_shell *shell, const char *line)
     shell->num_tokens = token_count;
     shell->tokens = malloc(sizeof(t_token) * (token_count + 1));
     if (!shell->tokens)
-        return (ERR_LEX);
+        return (ERR_MEMORY);
     if (tokenize_all(shell, line) || normalize_tokens(shell))
     {
-        ft_free_tokens(shell->tokens);
-        return (ERR_LEX);
+        free_tokens(shell->tokens);
+        return (ERR_MEMORY);
     }
     return (ERR_NONE);
 }
