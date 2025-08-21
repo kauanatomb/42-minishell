@@ -6,7 +6,7 @@
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 10:32:28 by ktombola          #+#    #+#             */
-/*   Updated: 2025/08/12 10:47:47 by ktombola         ###   ########.fr       */
+/*   Updated: 2025/08/21 18:10:50 by ktombola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,21 +48,21 @@ typedef enum e_token_type
 	APPEND,
 }	t_token_type;
 
-typedef struct	s_token
+typedef struct s_token
 {
 	char			*value;
 	t_token_type	type;
 	t_quote_type	quote_type;
-}			t_token;
-// at the moment im not dealing with heredoc
+}	t_token;
+
 typedef struct s_cmd
 {
-	char    **argv; // WORDs
-	char    *infile; // if <
-	char    *outfile; // if > or >>
-	int     append;      // 1 if ">>", 0 if ">"
-	struct s_cmd *next;  // next if pipes
-}   t_cmd;
+	char			**argv;
+	char			*infile;
+	char			*outfile;
+	int				append;
+	struct s_cmd	*next;
+}	t_cmd;
 
 typedef struct s_shell
 {
@@ -75,28 +75,27 @@ typedef struct s_shell
 }	t_shell;
 
 // Main
-int	ft_isspace(char c);
+int		ft_isspace(char c);
 
 // Shell struct
-int	init_shell_env(t_shell *shell, char **envp);
+int		init_shell_env(t_shell *shell, char **envp);
 
 // Signal
 void	signal_receiver(void);
 
 // Lexer
-int lex_line(t_shell *shell, const char *line);
-void skip_operator(const char *line, int *i);
-int ft_is_operator(char c);
-void skip_word(const char *line, int *i);
+int		lex_line(t_shell *shell, const char *line);
+void	skip_operator(const char *line, int *i);
+int		ft_is_operator(char c);
+void	skip_word(const char *line, int *i);
+int		tokenize_all(t_shell *shell, const char *line);
+void	free_tokens(t_token *tokens);
+char	*ft_strndup(const char *s, size_t n);
 
-int tokenize_all(t_shell *shell, const char *line);
-void free_tokens(t_token *tokens);
-char *ft_strndup(const char *s, size_t n);
-
-// PARSE
-int parse(t_shell *shell);
-void    print_parse_error(t_error code, t_token *token);
-void    free_cmd_list(t_cmd *cmds);
+// Parse
+int		parse(t_shell *shell);
+void	print_parse_error(t_error code, t_token *token);
+void	free_cmd_list(t_cmd *cmds);
 
 // Global
 extern volatile sig_atomic_t	g_signal;

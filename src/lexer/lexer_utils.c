@@ -12,30 +12,30 @@
 
 #include "minishell.h"
 
-void free_tokens(t_token *tokens)
+void	free_tokens(t_token *tokens)
 {
-    int i;
+	int	i;
 
-    if (!tokens)
-        return ;
-    i = 0;
-    while (tokens[i].value)
-    {
-        free(tokens[i].value);
-        i++;
-    }
-    free(tokens);
+	if (!tokens)
+		return ;
+	i = 0;
+	while (tokens[i].value)
+	{
+		free(tokens[i].value);
+		i++;
+	}
+	free(tokens);
 }
 
-char *ft_strndup(const char *s, size_t n)
+char	*ft_strndup(const char *s, size_t n)
 {
-    char *dup;
+	char	*dup;
 
-    if (!s)
-        return (NULL);
-    dup = malloc(n + 1);
-    if (!dup)
-        return (NULL);
-    ft_strlcpy(dup, s, n + 1);
-    return (dup);
+	if (!s)
+		return (NULL);
+	dup = malloc(n + 1);
+	if (!dup)
+		return (NULL);
+	ft_strlcpy(dup, s, n + 1);
+	return (dup);
 }

@@ -6,105 +6,105 @@
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 10:32:28 by ktombola          #+#    #+#             */
-/*   Updated: 2025/08/12 10:55:19 by ktombola         ###   ########.fr       */
+/*   Updated: 2025/08/21 18:42:49 by ktombola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 //i need to treat errors
 
-int count_words(t_shell *shell, int start)
+int	count_words(t_shell *shell, int start)
 {
-    int count;
+	int	count;
 
-    count = 0;
-    while (start < shell->num_tokens && shell->tokens[start].type != PIPE)
-    {
-        if (shell->tokens[start].type == WORD)
-            count++;
-        start++;
-    }
-    return (count);
+	count = 0;
+	while (start < shell->num_tokens && shell->tokens[start].type != PIPE)
+	{
+		if (shell->tokens[start].type == WORD)
+			count++;
+		start++;
+	}
+	return (count);
 }
 
-t_cmd   *new_cmd(int counted_words)
+t_cmd	*new_cmd(int counted_words)
 {
-    t_cmd   *cmd;
+	t_cmd	*cmd;
 
-    cmd = malloc(sizeof(t_cmd));
-    if (!cmd)
-        return (NULL);
-    cmd->argv = ft_calloc(counted_words + 1, sizeof(char *));
-    if (!cmd->argv)
-        return (free(cmd), NULL);
-    cmd->infile = NULL;
-    cmd->outfile = NULL;
-    cmd->append = 0;
-    cmd->next = NULL;
-    return (cmd);
+	cmd = malloc(sizeof(t_cmd));
+	if (!cmd)
+		return (NULL);
+	cmd->argv = ft_calloc(counted_words + 1, sizeof(char *));
+	if (!cmd->argv)
+		return (free(cmd), NULL);
+	cmd->infile = NULL;
+	cmd->outfile = NULL;
+	cmd->append = 0;
+	cmd->next = NULL;
+	return (cmd);
 }
 
-int add_to_argv(t_cmd *cmd, char *word, int pos, int max_words)
+int	add_to_argv(t_cmd *cmd, char *word, int pos, int max_words)
 {
-    if (pos >= max_words)
-        return (ERR_PARSE);
-    cmd->argv[pos] = ft_strdup(word);
-    if (!cmd->argv[pos])
-        return (ERR_PARSE);
-    return (ERR_NONE);
+	if (pos >= max_words)
+		return (ERR_PARSE);
+	cmd->argv[pos] = ft_strdup(word);
+	if (!cmd->argv[pos])
+		return (ERR_PARSE);
+	return (ERR_NONE);
 }
 
-int parse(t_shell *shell)
+int	parse(t_shell *shell)
 {
-    t_cmd *head;
-    t_cmd *curr;
-    int     counted_words;
+	t_cmd	*head;
+	t_cmd	*curr;
+	int	counted_words;
 
-    counted_words = count_words(shell, 0);
-    head = new_cmd(counted_words);
-    if (!head)
-        return (ERR_PARSE);
-    shell->cmds = head;
-    curr = head;
-    int i = 0;
-    int start = 0;
-    while (i < shell->num_tokens)
-    {
-        if (shell->tokens[i].type == WORD)
-        {
-            add_to_argv(curr, shell->tokens[i].value, start, counted_words);
-            start++;
-        }
-        else if (shell->tokens[i].type == INPUT)
-        {
-            i++;
-            if (!shell->tokens[i].value)
-                return (print_parse_error(ERR_MISSING_FILENAME, NULL),
-                    ERR_MISSING_FILENAME);
-            curr->infile = ft_strdup(shell->tokens[i].value);
-        }
-        else if (shell->tokens[i].type == OUTPUT || shell->tokens[i].type == APPEND)
-        {
-            int is_append = (shell->tokens[i].type == APPEND);
-            i++;
-            if (!shell->tokens[i].value)
-                return (print_parse_error(ERR_MISSING_FILENAME, NULL),
-                    ERR_MISSING_FILENAME);
-            curr->outfile = ft_strdup(shell->tokens[i].value);
-            curr->append = is_append;
-        }
-        else if (shell->tokens[i].type == PIPE)
-        {
-            if (start == 0 || (shell->tokens[i + 1].type == PIPE)
-                || i + 1 >= shell->num_tokens)
-                return (print_parse_error(ERR_UNEXPECTED_TOKEN, &shell->tokens[i]), ERR_UNEXPECTED_TOKEN);
-            curr->next = new_cmd(count_words(shell, i + 1));
-            if (!curr->next)
-                return (print_parse_error(ERR_MEMORY, NULL), ERR_MEMORY);
-            curr = curr->next;
-            start = 0;
-        }
-        i++;
-    }
-    return (ERR_NONE);
+	counted_words = count_words(shell, 0);
+	head = new_cmd(counted_words);
+	if (!head)
+		return (ERR_PARSE);
+	shell->cmds = head;
+	curr = head;
+	int i = 0;
+	int start = 0;
+	while (i < shell->num_tokens)
+	{
+		if (shell->tokens[i].type == WORD)
+		{
+			add_to_argv(curr, shell->tokens[i].value, start, counted_words);
+			start++;
+		}
+		else if (shell->tokens[i].type == INPUT)
+		{
+			i++;
+			if (!shell->tokens[i].value)
+				return (print_parse_error(ERR_MISSING_FILENAME, NULL),
+						ERR_MISSING_FILENAME);
+			curr->infile = ft_strdup(shell->tokens[i].value);
+		}
+		else if (shell->tokens[i].type == OUTPUT || shell->tokens[i].type == APPEND)
+		{
+			int is_append = (shell->tokens[i].type == APPEND);
+			i++;
+			if (!shell->tokens[i].value)
+				return (print_parse_error(ERR_MISSING_FILENAME, NULL),
+						ERR_MISSING_FILENAME);
+			curr->outfile = ft_strdup(shell->tokens[i].value);
+			curr->append = is_append;
+		}
+		else if (shell->tokens[i].type == PIPE)
+		{
+			if (start == 0 || (shell->tokens[i + 1].type == PIPE)
+					|| i + 1 >= shell->num_tokens)
+				return (print_parse_error(ERR_UNEXPECTED_TOKEN, &shell->tokens[i]), ERR_UNEXPECTED_TOKEN);
+			curr->next = new_cmd(count_words(shell, i + 1));
+			if (!curr->next)
+				return (print_parse_error(ERR_MEMORY, NULL), ERR_MEMORY);
+			curr = curr->next;
+			start = 0;
+		}
+		i++;
+	}
+	return (ERR_NONE);
 }
