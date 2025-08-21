@@ -77,18 +77,27 @@ int parse(t_shell *shell)
         else if (shell->tokens[i].type == INPUT)
         {
             i++;
+            if (!shell->tokens[i].value)
+                return (ERR_PARSE);
             curr->infile = ft_strdup(shell->tokens[i].value);
         }
         else if (shell->tokens[i].type == OUTPUT || shell->tokens[i].type == APPEND)
         {
             int is_append = (shell->tokens[i].type == APPEND);
             i++;
+            if (!shell->tokens[i].value)
+                return (ERR_PARSE);
             curr->outfile = ft_strdup(shell->tokens[i].value);
             curr->append = is_append;
         }
         else if (shell->tokens[i].type == PIPE)
         {
+            if (start == 0 || (shell->tokens[i + 1].type == PIPE)
+                || !shell->tokens[i + 1].value)
+                return (ERR_PARSE);
             curr->next = new_cmd(count_words(shell, i));
+            if (!curr->next)
+                return (ERR_PARSE);
             curr = curr->next;
             start = 0;
         }
