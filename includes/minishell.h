@@ -25,6 +25,8 @@ typedef enum e_error
 {
 	ERR_NONE,
 	ERR_MEMORY,
+	ERR_UNEXPECTED_TOKEN,
+	ERR_MISSING_FILENAME,
 	ERR_PARSE,
 	ERR_EXEC,
 }	t_error;
@@ -93,6 +95,8 @@ char *ft_strndup(const char *s, size_t n);
 
 // PARSE
 int parse(t_shell *shell);
+void    print_parse_error(t_error code, t_token *token);
+void    free_cmd_list(t_cmd *cmds);
 
 // Global
 extern volatile sig_atomic_t	g_signal;

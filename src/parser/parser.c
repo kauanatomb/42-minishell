@@ -34,7 +34,7 @@ t_cmd   *new_cmd(int counted_words)
     cmd = malloc(sizeof(t_cmd));
     if (!cmd)
         return (NULL);
-    cmd->argv = calloc(counted_words + 1, sizeof(char *));
+    cmd->argv = ft_calloc(counted_words + 1, sizeof(char *));
     if (!cmd->argv)
         return (free(cmd), NULL);
     cmd->infile = NULL;
@@ -64,6 +64,7 @@ int parse(t_shell *shell)
     head = new_cmd(counted_words);
     if (!head)
         return (ERR_PARSE);
+    shell->cmds = head;
     curr = head;
     int i = 0;
     int start = 0;
@@ -78,7 +79,8 @@ int parse(t_shell *shell)
         {
             i++;
             if (!shell->tokens[i].value)
-                return (ERR_PARSE);
+                return (print_parse_error(ERR_MISSING_FILENAME, NULL),
+                    ERR_MISSING_FILENAME);
             curr->infile = ft_strdup(shell->tokens[i].value);
         }
         else if (shell->tokens[i].type == OUTPUT || shell->tokens[i].type == APPEND)
@@ -86,7 +88,8 @@ int parse(t_shell *shell)
             int is_append = (shell->tokens[i].type == APPEND);
             i++;
             if (!shell->tokens[i].value)
-                return (ERR_PARSE);
+                return (print_parse_error(ERR_MISSING_FILENAME, NULL),
+                    ERR_MISSING_FILENAME);
             curr->outfile = ft_strdup(shell->tokens[i].value);
             curr->append = is_append;
         }
@@ -94,15 +97,14 @@ int parse(t_shell *shell)
         {
             if (start == 0 || (shell->tokens[i + 1].type == PIPE)
                 || i + 1 >= shell->num_tokens)
-                return (ERR_PARSE);
+                return (print_parse_error(ERR_UNEXPECTED_TOKEN, &shell->tokens[i]), ERR_UNEXPECTED_TOKEN);
             curr->next = new_cmd(count_words(shell, i + 1));
             if (!curr->next)
-                return (ERR_PARSE);
+                return (print_parse_error(ERR_MEMORY, NULL), ERR_MEMORY);
             curr = curr->next;
             start = 0;
         }
         i++;
     }
-    shell->cmds = head;
     return (ERR_NONE);
 }
