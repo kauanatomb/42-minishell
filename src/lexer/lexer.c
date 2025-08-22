@@ -52,7 +52,6 @@ static char	*strip_quotes(const char *src, int *quote_type)
 			*quote_type = 1;
 		else
 			*quote_type = 2;
-		// 1=single, 2=double
 		return (ft_substr(src, 1, len - 2));
 	}
 	return (ft_strdup(src));

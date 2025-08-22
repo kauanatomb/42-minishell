@@ -14,7 +14,6 @@
 
 void	free_cmd_list(t_cmd *cmds)
 {
-	int		i;
 	t_cmd	*next;
 	t_redir	*next_r;
 	t_redir	*last;
@@ -22,13 +21,7 @@ void	free_cmd_list(t_cmd *cmds)
 	while (cmds)
 	{
 		next = cmds->next;
-		if (cmds->argv)
-		{
-			i = 0;
-			while (cmds->argv[i])
-				free(cmds->argv[i++]);
-			free(cmds->argv);
-		}
+		ft_free_array(cmds->argv);
 		if (cmds->redirs)
 		{
 			last = cmds->redirs;

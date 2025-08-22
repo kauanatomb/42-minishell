@@ -12,6 +12,16 @@
 
 #include "minishell.h"
 
+int	ft_array_len(char **arr)
+{
+	int	size;
+
+	size = 0;
+	while (arr && arr[size])
+		size++;
+	return (size);
+}
+
 int	ft_isspace(char c)
 {
 	return ((c >= 9 && c <= 13) || c == ' ');

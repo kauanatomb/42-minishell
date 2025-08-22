@@ -12,16 +12,6 @@
 
 #include "minishell.h"
 
-static int	ft_array_len(char **arr)
-{
-	int	size;
-
-	size = 0;
-	while (arr && arr[size])
-		size++;
-	return (size);
-}
-
 static char	*build_env(const char *key, const char *value)
 {
 	char	*entry;

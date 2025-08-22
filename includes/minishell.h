@@ -73,8 +73,8 @@ typedef struct s_cmd
 
 typedef struct s_shell
 {
-	t_error	error;
-	int		path_flag;
+	t_error	error; // error in the path of lex parse ...
+	int		path_flag; // if the env didnt work
 	char	**env;
 	t_token	*tokens;
 	t_cmd	*cmds;
@@ -85,9 +85,9 @@ typedef struct s_shell
 int		ft_isspace(char c);
 void	clean_extra_fds(void);
 int		exit_ctrld(t_shell *shell);
-
-// Shell struct
 int		init_shell_env(t_shell *shell, char **envp);
+int		ft_array_len(char **arr);
+void	ft_free_array(char **dest);
 
 // Signal
 void	signal_receiver(void);
