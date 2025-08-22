@@ -24,11 +24,12 @@
 typedef enum e_error
 {
 	ERR_NONE,
-	ERR_MEMORY,
-	ERR_UNEXPECTED_TOKEN,
-	ERR_MISSING_FILENAME,
+	ERR_MEMORY = 1,
+	ERR_MISSING_FILENAME = 2,
+	ERR_UNEXPECTED_TOKEN = 2,
 	ERR_PARSE,
 	ERR_EXEC,
+	ERR_COMM_NOT_FOUND = 127,
 }	t_error;
 
 typedef enum e_quote_type

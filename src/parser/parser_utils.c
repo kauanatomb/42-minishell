@@ -42,21 +42,17 @@ void	print_parse_error(t_error code, t_token *token)
 {
 	if (code == ERR_UNEXPECTED_TOKEN && token)
 	{
-		fprintf(stderr,
-			"minishell: syntax error near unexpected token `%s'\n",
-			token->value);
+		ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
+		ft_putstr_fd(token->value, 2);
+		ft_putstr_fd("'\n", 2);
 	}
 	else if (code == ERR_MISSING_FILENAME)
 	{
-		fprintf(stderr,
-			"minishell: syntax error near unexpected token `newline'\n");
+		ft_putstr_fd("minishell: syntax error near unexpected ", 2);
+		ft_putstr_fd("token `newline'\n", 2);
 	}
 	else if (code == ERR_MEMORY)
-	{
-		fprintf(stderr, "minishell: memory allocation error\n");
-	}
+		ft_putstr_fd("minishell: memory allocation error\n", 2);
 	else if (code == ERR_PARSE)
-	{
-		fprintf(stderr, "minishell: parse error\n");
-	}
+		ft_putstr_fd("minishell: parse error\n", 2);
 }
