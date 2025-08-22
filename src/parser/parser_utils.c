@@ -15,26 +15,33 @@
 void	free_cmd_list(t_cmd *cmds)
 {
 	int		i;
-	t_cmd	*curr;
 	t_cmd	*next;
+	t_redir	*next_r;
+	t_redir	*last;
 
-	if (!cmds)
-		return ;
-	curr = cmds;
-	while (curr)
+	while (cmds)
 	{
-		next = curr->next;
-		if (curr->argv)
+		next = cmds->next;
+		if (cmds->argv)
 		{
 			i = 0;
-			while (curr->argv[i])
-				free(curr->argv[i++]);
-			free(curr->argv);
+			while (cmds->argv[i])
+				free(cmds->argv[i++]);
+			free(cmds->argv);
 		}
-		free(curr->infile);
-		free(curr->outfile);
-		free(curr);
-		curr = next;
+		if (cmds->redirs)
+		{
+			last = cmds->redirs;
+			while (last)
+			{
+				next_r = last->next;
+				free(last->filename);
+				free(last);
+				last = next_r;
+			}
+		}
+		free(cmds);
+		cmds = next;
 	}
 }
 
@@ -46,7 +53,7 @@ void	print_parse_error(t_error code, t_token *token)
 		ft_putstr_fd(token->value, 2);
 		ft_putstr_fd("'\n", 2);
 	}
-	else if (code == ERR_MISSING_FILENAME)
+	else if (code == ERR_MISS_FILENAME)
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected ", 2);
 		ft_putstr_fd("token `newline'\n", 2);
@@ -55,4 +62,33 @@ void	print_parse_error(t_error code, t_token *token)
 		ft_putstr_fd("minishell: memory allocation error\n", 2);
 	else if (code == ERR_PARSE)
 		ft_putstr_fd("minishell: parse error\n", 2);
+}
+
+int	count_words(t_shell *shell, int start)
+{
+	int	count;
+
+	count = 0;
+	while (start < shell->num_tokens && shell->tokens[start].type != PIPE)
+	{
+		if (shell->tokens[start].type == WORD)
+			count++;
+		start++;
+	}
+	return (count);
+}
+
+t_cmd	*new_cmd(int counted_words)
+{
+	t_cmd	*cmd;
+
+	cmd = malloc(sizeof(t_cmd));
+	if (!cmd)
+		return (NULL);
+	cmd->argv = ft_calloc(counted_words + 1, sizeof(char *));
+	if (!cmd->argv)
+		return (free(cmd), NULL);
+	cmd->redirs = NULL;
+	cmd->next = NULL;
+	return (cmd);
 }

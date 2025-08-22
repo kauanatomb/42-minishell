@@ -14,35 +14,6 @@
 
 volatile sig_atomic_t	g_signal = 0;
 
-void	clean_extra_fds(void)
-{
-	int	i;
-
-	i = 3;
-	while (i < 1024)
-		close(i++);
-}
-
-void	free_shell_env(char **env)
-{
-	int	i;
-
-	if (!env)
-		return ;
-	i = 0;
-	while (env[i])
-		free(env[i++]);
-	free(env);
-}
-
-int	exit_ctrld(t_shell *shell)
-{
-	free_shell_env(shell->env);
-	write(STDIN_FILENO, "exit\n", 5);
-	clean_extra_fds();
-	exit(0);
-}
-
 bool	has_unclosed_quotes(char *line)
 {
 	bool	single_q;
@@ -64,11 +35,6 @@ bool	has_unclosed_quotes(char *line)
 		return (true);
 	}
 	return (false);
-}
-
-int	ft_isspace(char c)
-{
-	return ((c >= 9 && c <= 13) || c == ' ');
 }
 
 bool	is_line_empty(char *line)
@@ -101,25 +67,34 @@ int	check_entry(t_shell *shell, char *line)
 		free_cmd_list(shell->cmds);
 		return (ret);
 	}
-	if (!shell->cmds)
-		return (ERR_MEMORY);
+	// verify the g_signal == 130, why??
 	int i = 0;
 	int j;
+	int y = 0;
+	t_redir *last;
 	t_cmd *curr = shell->cmds;
 	while (curr)
 	{
 		j = 0;
-		printf("Command[%d]: infile: %s, outfile: %s, append: %d, ", i, curr->infile, curr->outfile, curr->append);
+		printf("Command[%d]: argv list: ", i);
 		while (curr->argv[j])
 		{
-			printf("argv list: %s\n", curr->argv[j]);
+			printf("%s, ", curr->argv[j]);
 			j++;
+		}
+		printf("\n");
+		last = curr->redirs;
+		while (last)
+		{
+			printf("Redirect[%d], fd[%d], name: %s, type: %d \n", y, last->fd, last->filename, last->type);
+			y++;
+			last = last->next;
 		}
 		i++;
 		curr = curr->next;
 	}
 	printf("Total cmd: %d\n", i);
-	// more steps: handle signal g_signal and expand
+	// more steps: expand
 	return (0);
 }
 
@@ -127,11 +102,11 @@ int	read_line(t_shell *shell)
 {
 	char	*line;
 
-	rl_on_new_line(); // Prepare readline for new input
+	rl_on_new_line();
 	line = readline("minishell> ");
 	if (!line)
 	{
-		rl_clear_history(); // Clear previous history
+		rl_clear_history();
 		exit_ctrld(shell);
 	}
 	if (has_unclosed_quotes(line) || is_line_empty(line))
@@ -140,7 +115,9 @@ int	read_line(t_shell *shell)
 	shell->error = check_entry(shell, line);
 	if (shell->error)
 		return (free(line), 0);
-	// more steps: execution and clean
+	// more steps: check redir and execution
+	free_cmd_list(shell->cmds);
+	free_tokens(shell->tokens);
 	clean_extra_fds();
 	return (free(line), 1);
 }

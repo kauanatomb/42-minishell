@@ -25,7 +25,7 @@ typedef enum e_error
 {
 	ERR_NONE,
 	ERR_MEMORY = 1,
-	ERR_MISSING_FILENAME = 2,
+	ERR_MISS_FILENAME = 2,
 	ERR_UNEXPECTED_TOKEN = 2,
 	ERR_PARSE,
 	ERR_EXEC,
@@ -56,12 +56,18 @@ typedef struct s_token
 	t_quote_type	quote_type;
 }	t_token;
 
+typedef struct s_redir
+{
+	int				fd;
+	char			*filename;
+	t_token_type	type;
+	struct s_redir	*next;
+}	t_redir;
+
 typedef struct s_cmd
 {
 	char			**argv;
-	char			*infile;
-	char			*outfile;
-	int				append;
+	t_redir			*redirs;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -77,6 +83,8 @@ typedef struct s_shell
 
 // Main
 int		ft_isspace(char c);
+void	clean_extra_fds(void);
+int		exit_ctrld(t_shell *shell);
 
 // Shell struct
 int		init_shell_env(t_shell *shell, char **envp);
@@ -97,6 +105,8 @@ char	*ft_strndup(const char *s, size_t n);
 int		parse(t_shell *shell);
 void	print_parse_error(t_error code, t_token *token);
 void	free_cmd_list(t_cmd *cmds);
+int		count_words(t_shell *shell, int start);
+t_cmd	*new_cmd(int counted_words);
 
 // Global
 extern volatile sig_atomic_t	g_signal;
