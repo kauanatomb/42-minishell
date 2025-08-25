@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main_utils.c                                       :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,46 +12,30 @@
 
 #include "minishell.h"
 
-int	ft_array_len(char **arr)
-{
-	int	size;
-
-	size = 0;
-	while (arr && arr[size])
-		size++;
-	return (size);
-}
-
-int	ft_isspace(char c)
-{
-	return ((c >= 9 && c <= 13) || c == ' ');
-}
-
-void	clean_extra_fds(void)
+void	free_tokens(t_token *tokens)
 {
 	int	i;
 
-	i = 3;
-	while (i < 1024)
-		close(i++);
-}
-
-void	free_shell_env(char **env)
-{
-	int	i;
-
-	if (!env)
+	if (!tokens)
 		return ;
 	i = 0;
-	while (env[i])
-		free(env[i++]);
-	free(env);
+	while (tokens[i].value)
+	{
+		free(tokens[i].value);
+		i++;
+	}
+	free(tokens);
 }
 
-int	exit_ctrld(t_shell *shell)
+char	*ft_strndup(const char *s, size_t n)
 {
-	free_shell_env(shell->env);
-	write(STDIN_FILENO, "exit\n", 5);
-	clean_extra_fds();
-	exit(0);
+	char	*dup;
+
+	if (!s)
+		return (NULL);
+	dup = malloc(n + 1);
+	if (!dup)
+		return (NULL);
+	ft_strlcpy(dup, s, n + 1);
+	return (dup);
 }

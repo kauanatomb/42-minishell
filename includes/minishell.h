@@ -108,6 +108,9 @@ void	free_cmd_list(t_cmd *cmds);
 int		count_words(t_shell *shell, int start);
 t_cmd	*new_cmd(int counted_words);
 
+// Expand var
+int		main_expand(t_shell *shell);
+
 // Global
 extern volatile sig_atomic_t	g_signal;
 

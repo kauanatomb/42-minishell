@@ -12,9 +12,10 @@
 
 NAME    := minishell
 
-SRCS     := src/main/main.c src/main/main_utils.c src/main/struct.c \
+SRCS     := src/main/main.c src/main/utils.c src/main/struct.c \
 		   	src/signal/handler.c src/lexer/lexer.c src/lexer/tokenizer.c \
-			src/lexer/lexer_utils.c src/parser/parser.c src/parser/parser_utils.c
+			src/lexer/utils.c src/parser/parser.c src/parser/utils.c \
+			src/expandvar/main_expand.c
 
 OBJS     := $(SRCS:.c=.o)
 

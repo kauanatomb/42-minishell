@@ -94,7 +94,13 @@ int	check_entry(t_shell *shell, char *line)
 		curr = curr->next;
 	}
 	printf("Total cmd: %d\n", i);
-	// more steps: expand
+	ret = main_expand(shell);
+	if (ret != ERR_NONE)
+	{
+		free_tokens(shell->tokens);
+		free_cmd_list(shell->cmds);
+		return (ret);
+	}
 	return (0);
 }
 
