@@ -68,6 +68,13 @@ int	check_entry(t_shell *shell, char *line)
 		return (ret);
 	}
 	// verify the g_signal == 130, why??
+	ret = main_expand(shell);
+	if (ret != ERR_NONE)
+	{
+		free_tokens(shell->tokens);
+		free_cmd_list(shell->cmds);
+		return (ret);
+	}
 	int i = 0;
 	int j;
 	int y = 0;
@@ -94,13 +101,6 @@ int	check_entry(t_shell *shell, char *line)
 		curr = curr->next;
 	}
 	printf("Total cmd: %d\n", i);
-	ret = main_expand(shell);
-	if (ret != ERR_NONE)
-	{
-		free_tokens(shell->tokens);
-		free_cmd_list(shell->cmds);
-		return (ret);
-	}
 	return (0);
 }
 
