@@ -61,6 +61,7 @@ typedef struct s_redir
 	int				fd;
 	char			*filename;
 	t_token_type	type;
+	t_quote_type	quote_type;
 	struct s_redir	*next;
 }	t_redir;
 
@@ -74,7 +75,7 @@ typedef struct s_cmd
 typedef struct s_shell
 {
 	t_error	error; // error in the path of lex parse ...
-	int		path_flag; // if the env didnt work
+	int		path_flag; // if the cmd dont find path
 	char	**env;
 	t_token	*tokens;
 	t_cmd	*cmds;
@@ -110,6 +111,9 @@ t_cmd	*new_cmd(int counted_words);
 
 // Expand var
 int		main_expand(t_shell *shell);
+char	*expand_dollar_question(t_shell *shell, char *result);
+char	*expand_key_var(char **str, t_shell *shell, char *result);
+char	*append_char_to_result(char c, char *result);
 
 // Global
 extern volatile sig_atomic_t	g_signal;

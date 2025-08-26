@@ -6,128 +6,118 @@
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 10:32:28 by ktombola          #+#    #+#             */
-/*   Updated: 2025/08/26 08:43:04 by ktombola         ###   ########.fr       */
+/*   Updated: 2025/08/26 12:32:28 by ktombola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*extract_key(char *p)
+char	*append_char_to_result(char c, char *result)
 {
-	int	i;
+	char	tmp[2];
 
-	i = 0;
-	if (!ft_isalpha(p[0]) && p[0] != '_')
+	tmp[0] = c;
+	tmp[1] = '\0';
+	result = ft_strjoin_and_free(result, tmp);
+	if (!result)
 		return (NULL);
-	while (p[i] && (ft_isalnum(p[i]) || p[i] == '_'))
-		i++;
-	return (ft_substr(p, 0, i));
-}
-
-char	*getenv_from_envp(const char *key, char **env)
-{
-	int	i;
-	int	len;
-
-	len = ft_strlen(key);
-	i = 0;
-	while (env[i])
-	{
-		if (ft_strncmp(env[i], key, len) == 0 && env[i][len] == '=')
-			return (env[i] + len + 1);
-		i++;
-	}
-	return (NULL);
+	return (result);
 }
 
 char	*expand_var(char *str, t_shell *shell)
 {
 	char	*result;
-	char	*p;
-	char	*key;
-	char	*value;
-	char	tmp[2];
 
 	result = ft_strdup("");
 	if (!result)
 		return (NULL);
-	p = str;
-	while (*p)
+	while (*str)
 	{
-		if (*p == '$')
+		if (*str == '$')
 		{
-			p++;
-			if (*p == '?')
+			str++;
+			if (*str == '?')
 			{
-				value = ft_itoa(shell->error);
-				result = ft_strjoin_and_free(result, value);
-				p++;
-				continue ;
-			}
-			key = extract_key(p);
-			if (key)
-			{
-				value = getenv_from_envp(key, shell->env);
-				if (value)
-					result = ft_strjoin_and_free(result, value);
-				p += ft_strlen(key);
-				free(key);
+				result = expand_dollar_question(shell, result);
+				if (!result)
+					return (NULL);
+				str++;
 			}
 			else
 			{
-                tmp[0] = *p;
-				tmp[1] = '\0';
-				result = ft_strjoin_and_free(result, tmp);
-				p++;
+				result = expand_key_var(&str, shell, result);
+				if (!result)
+					return (NULL);
 			}
 		}
 		else
 		{
-			tmp[0] = *p;
-			tmp[1] = '\0';
-			result = ft_strjoin_and_free(result, tmp);
-			p++;
+			result = append_char_to_result(*str, result);
+			if (!result)
+				return (NULL);
+			str++;
 		}
 	}
 	return (result);
+}
+
+static int	expand_cmd_argv(t_shell *shell, t_cmd *cmd, int *tok_i)
+{
+	int		i;
+	char	*expanded;
+
+	i = 0;
+	while (cmd->argv[i])
+	{
+		if (shell->tokens[*tok_i].quote_type != SINGLE)
+		{
+			expanded = expand_var(cmd->argv[i], shell);
+			if (!expanded)
+				return (ERR_MEMORY);
+			free(cmd->argv[i]);
+			cmd->argv[i] = expanded;
+		}
+		i++;
+		(*tok_i)++;
+	}
+	return (ERR_NONE);
+}
+
+static int	expand_cmd_redirs(t_shell *shell, t_cmd *cmd, int *tok_i)
+{
+	t_redir	*r;
+	char	*expanded;
+
+	r = cmd->redirs;
+	while (r)
+	{
+		if (r->type != HEREDOC && r->quote_type != SINGLE && r->filename)
+		{
+			expanded = expand_var(r->filename, shell);
+			if (!expanded)
+				return (ERR_MEMORY);
+			free(r->filename);
+			r->filename = expanded;
+		}
+		r = r->next;
+		(*tok_i)++;
+	}
+	return (ERR_NONE);
 }
 
 int	main_expand(t_shell *shell)
 {
 	t_cmd	*cmd;
 	int		tok_i;
-	int		i;
-	char	*expanded;
-	t_redir	*r;
 
 	cmd = shell->cmds;
 	tok_i = 0;
 	while (cmd)
 	{
-		i = 0;
-		while (cmd->argv[i])
-		{
-			if (shell->tokens[tok_i].quote_type != SINGLE)
-			{
-				expanded = expand_var(cmd->argv[i], shell);
-				free(cmd->argv[i]);
-				cmd->argv[i] = expanded;
-			}
-			i++;
-			tok_i++;
-		}
-		r = cmd->redirs;
-		while (r)
-		{
-			if (r->type != HEREDOC && r->filename)
-			{
-				expanded = expand_var(r->filename, shell);
-				free(r->filename);
-				r->filename = expanded;
-			}
-			r = r->next;
-			tok_i++;
-		}
+		if (expand_cmd_argv(shell, cmd, &tok_i) != ERR_NONE)
+			return (ERR_MEMORY);
+		if (expand_cmd_redirs(shell, cmd, &tok_i) != ERR_NONE)
+			return (ERR_MEMORY);
 		cmd = cmd->next;
 	}
 	return (ERR_NONE);

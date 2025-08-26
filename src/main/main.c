@@ -93,7 +93,7 @@ int	check_entry(t_shell *shell, char *line)
 		last = curr->redirs;
 		while (last)
 		{
-			printf("Redirect[%d], fd[%d], name: %s, type: %d \n", y, last->fd, last->filename, last->type);
+			printf("Redirect[%d], fd[%d], name: %s, type: %d, quote: %d \n", y, last->fd, last->filename, last->type, last->quote_type);
 			y++;
 			last = last->next;
 		}
