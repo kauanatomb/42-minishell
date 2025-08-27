@@ -63,16 +63,20 @@ int	check_entry(t_shell *shell, char *line)
 	ret = parse(shell);
 	if (ret != ERR_NONE)
 	{
-		free_tokens(shell->tokens);
 		free_cmd_list(shell->cmds);
+		free_tokens(shell->tokens);
 		return (ret);
 	}
-	// verify the g_signal == 130, why??
+	if (g_signal == 130)
+	{
+		g_signal = 0;
+		shell->error = 130;
+	}
 	ret = main_expand(shell);
 	if (ret != ERR_NONE)
 	{
-		free_tokens(shell->tokens);
 		free_cmd_list(shell->cmds);
+		free_tokens(shell->tokens);
 		return (ret);
 	}
 	int i = 0;

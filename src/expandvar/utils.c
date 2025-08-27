@@ -86,6 +86,6 @@ char	*expand_dollar_question(t_shell *shell, char *result)
 		return (NULL);
 	result = ft_strjoin_and_free(result, value);
 	if (!result)
-		return (NULL);
-	return (result);
+		return (free(value), NULL);
+	return (free(value), result);
 }
