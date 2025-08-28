@@ -20,6 +20,7 @@
 # include <stdbool.h>
 # include <unistd.h>
 # include <signal.h>
+# include <sys/wait.h>
 
 typedef enum e_error
 {
@@ -74,8 +75,8 @@ typedef struct s_cmd
 
 typedef struct s_shell
 {
-	t_error	error; // error in the path of lex parse ...
-	int		path_flag; // if the cmd dont find path
+	t_error	error;
+	int		path_flag;
 	char	**env;
 	t_token	*tokens;
 	t_cmd	*cmds;
@@ -114,6 +115,11 @@ int		main_expand(t_shell *shell);
 char	*expand_dollar_question(t_shell *shell, char *result);
 char	*expand_key_var(char **str, t_shell *shell, char *result);
 char	*append_char_to_result(char c, char *result);
+
+// Execution
+void	execute_cmd(t_cmd *cmd, t_shell *shell);
+// Builtin
+int		builtin_echo(char **argv);
 
 // Global
 extern volatile sig_atomic_t	g_signal;

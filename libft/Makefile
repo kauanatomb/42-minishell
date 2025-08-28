@@ -19,7 +19,8 @@ SRCS			=	ft_isalnum.c ft_isprint.c ft_memcmp.c  ft_putchar_fd.c ft_split.c \
 					ft_putstr_fd.c  ft_strjoin.c ft_strmapi.c ft_strtrim.c \
 					ft_safeadd.c ft_putchar.c ft_puthex.c ft_putnbr.c ft_putstr.c \
 					ft_putunsign_int.c ft_printf.c ft_strjoin_and_free.c \
-					get_next_line.c ft_convertptr.c
+					get_next_line.c ft_convertptr.c ft_strcmp.c \
+					
 OBJS			= $(SRCS:.c=.o)
 
 BONUS			=	ft_lstadd_back_bonus.c ft_lstadd_front_bonus.c ft_lstclear_bonus.c \

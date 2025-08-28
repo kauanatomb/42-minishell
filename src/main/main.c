@@ -69,8 +69,8 @@ int	check_entry(t_shell *shell, char *line)
 	}
 	if (g_signal == 130)
 	{
-		g_signal = 0;
 		shell->error = 130;
+		g_signal = 0;
 	}
 	ret = main_expand(shell);
 	if (ret != ERR_NONE)
@@ -79,32 +79,6 @@ int	check_entry(t_shell *shell, char *line)
 		free_tokens(shell->tokens);
 		return (ret);
 	}
-	int i = 0;
-	int j;
-	int y = 0;
-	t_redir *last;
-	t_cmd *curr = shell->cmds;
-	while (curr)
-	{
-		j = 0;
-		printf("Command[%d]: argv list: ", i);
-		while (curr->argv[j])
-		{
-			printf("%s, ", curr->argv[j]);
-			j++;
-		}
-		printf("\n");
-		last = curr->redirs;
-		while (last)
-		{
-			printf("Redirect[%d], fd[%d], name: %s, type: %d, quote: %d \n", y, last->fd, last->filename, last->type, last->quote_type);
-			y++;
-			last = last->next;
-		}
-		i++;
-		curr = curr->next;
-	}
-	printf("Total cmd: %d\n", i);
 	return (0);
 }
 
@@ -125,7 +99,7 @@ int	read_line(t_shell *shell)
 	shell->error = check_entry(shell, line);
 	if (shell->error)
 		return (free(line), 0);
-	// more steps: check redir and execution
+	execute_cmd(shell->cmds, shell);
 	free_cmd_list(shell->cmds);
 	free_tokens(shell->tokens);
 	clean_extra_fds();
