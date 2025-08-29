@@ -12,29 +12,29 @@
 
 #include "minishell.h"
 
-char **split_key_value_env(char *s)
+char	**split_key_value_env(char *s)
 {
-    char **d;
-    char *equal;
+	char	**d;
+	char	*equal;
 
-    equal = ft_strchr(s, '=');
-    d = malloc(sizeof(char *) * 3);
-    if (!d)
-        return (NULL);
-    if (equal)
-        d[0] = ft_substr(s, 0, equal - s);
-    else
-        d[0] = ft_strdup(s);
-    if (!d[0])
-        return (free(d), NULL);
-    if (!equal)
-        d[1] = ft_strdup("");
-    else
-        d[1] = ft_substr(equal + 1, 0, ft_strlen(equal + 1));
-    if (!d[1])
-        return (free(d[0]), free(d), NULL);
-    d[2] = NULL;
-    return (d);
+	equal = ft_strchr(s, '=');
+	d = malloc(sizeof(char *) * 3);
+	if (!d)
+		return (NULL);
+	if (equal)
+		d[0] = ft_substr(s, 0, equal - s);
+	else
+		d[0] = ft_strdup(s);
+	if (!d[0])
+		return (free(d), NULL);
+	if (!equal)
+		d[1] = ft_strdup("");
+	else
+		d[1] = ft_substr(equal + 1, 0, ft_strlen(equal + 1));
+	if (!d[1])
+		return (free(d[0]), free(d), NULL);
+	d[2] = NULL;
+	return (d);
 }
 
 int	is_created(char *key, char **env)
@@ -46,8 +46,9 @@ int	is_created(char *key, char **env)
 		return (-1);
 	while (env[i])
 	{
-        if (!ft_strncmp(env[i], key, ft_strlen(key)) && env[i][ft_strlen(key)] == '=')
-            return (i);
+		if (!ft_strncmp(env[i], key, ft_strlen(key))
+			&& env[i][ft_strlen(key)] == '=')
+			return (i);
 		i++;
 	}
 	return (-1);
