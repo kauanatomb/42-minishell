@@ -6,29 +6,32 @@
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 10:32:28 by ktombola          #+#    #+#             */
-/*   Updated: 2025/08/12 10:55:19 by ktombola         ###   ########.fr       */
+/*   Updated: 2025/08/29 18:08:31 by ktombola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int builtin_cd(char **argv)
+int	builtin_cd(char **argv, t_shell *shell)
 {
-    // move throwth folders
+	(void)argv;
+	(void)shell;
+	// move throwth folders
+	return (0);
 }
 
-int builtin_exit(char **argv)
+int	builtin_exit(char **argv, t_shell *shell)
 {
-    // act like control d
+	(void)argv;
+	(void)shell;
+	// act like control d
+	return (0);
 }
 
-int builtin_export(char **argv)
+int	builtin_unset(char **argv, t_shell *shell)
 {
-    // change/add env var
-    
-}
-
-int builtin_unset(char **argv)
-{
-    // remove env var
+	(void)argv;
+	(void)shell;
+	// remove env var
+	return (0);
 }

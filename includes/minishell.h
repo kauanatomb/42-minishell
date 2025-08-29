@@ -81,6 +81,7 @@ int		exit_ctrld(t_shell *shell);
 int		init_shell_env(t_shell *shell, char **envp);
 int		ft_array_len(char **arr);
 void	ft_free_array(char **dest);
+bool	is_line_empty(char *line);
 
 // Signal
 void	signal_receiver(void);
@@ -112,6 +113,14 @@ char	*expand_var(char *str, t_shell *shell);
 void	execute_cmd(t_cmd *cmd, t_shell *shell);
 // Builtin
 int		builtin_echo(char **argv);
+int		builtin_unset(char **argv, t_shell *shell);
+int		builtin_export(char **argv, t_shell *shell);
+int		builtin_cd(char **argv, t_shell *shell);
+int		builtin_exit(char **argv, t_shell *shell);
+// utils
+char	**split_key_value_env(char *s);
+int		is_created(char *key, char **env);
+int		add_to_env(char **new_env, char ***env, char *l_env, int len);
 
 // Global
 extern volatile sig_atomic_t	g_signal;

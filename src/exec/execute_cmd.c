@@ -22,20 +22,20 @@ int is_builtin(char *name)
         || !ft_strcmp(name, "env"));
 }
 
-// int exec_builtin_parent(t_cmd *cmd, t_shell *shell)
-// {
-//     char *name = cmd->argv[0];
+int exec_builtin_parent(t_cmd *cmd, t_shell *shell)
+{
+    char *name = cmd->argv[0];
 
-//     if (!ft_strcmp(name, "cd"))
-//         return builtin_cd(cmd->argv, shell);
-//     if (!ft_strcmp(name, "exit"))
-//         return builtin_exit(cmd->argv, shell);
-//     if (!ft_strcmp(name, "export"))
-//         return builtin_export(cmd->argv, shell);
-//     if (!ft_strcmp(name, "unset"))
-//         return builtin_unset(cmd->argv, shell);
-//     return 1;
-// }
+    if (!ft_strcmp(name, "cd"))
+        return builtin_cd(cmd->argv, shell);
+    if (!ft_strcmp(name, "exit"))
+        return builtin_exit(cmd->argv, shell);
+    if (!ft_strcmp(name, "export"))
+        return builtin_export(cmd->argv, shell);
+    if (!ft_strcmp(name, "unset"))
+        return builtin_unset(cmd->argv, shell);
+    return (1);
+}
 
 int exec_builtin_child(t_cmd *cmd, t_shell *shell)
 {
@@ -87,7 +87,7 @@ void execute_cmd(t_cmd *cmd, t_shell *shell)
     if (!ft_strcmp(cmd->argv[0], "cd") || !ft_strcmp(cmd->argv[0], "exit")
         || !ft_strcmp(cmd->argv[0], "export") || !ft_strcmp(cmd->argv[0], "unset"))
     {
-        // exec_builtin_parent(cmd, shell);
+        exec_builtin_parent(cmd, shell);
     }
     else if (!ft_strcmp(cmd->argv[0], "echo") || !ft_strcmp(cmd->argv[0], "pwd")
         || !ft_strcmp(cmd->argv[0], "env"))
