@@ -33,13 +33,6 @@ typedef enum e_error
 	ERR_COMM_NOT_FOUND = 127,
 }	t_error;
 
-typedef enum e_quote_type
-{
-	NONE,
-	SINGLE,
-	DOUBLE,
-}	t_quote_type;
-
 typedef enum e_token_type
 {
 	WORD,
@@ -54,7 +47,6 @@ typedef struct s_token
 {
 	char			*value;
 	t_token_type	type;
-	t_quote_type	quote_type;
 }	t_token;
 
 typedef struct s_redir
@@ -62,7 +54,6 @@ typedef struct s_redir
 	int				fd;
 	char			*filename;
 	t_token_type	type;
-	t_quote_type	quote_type;
 	struct s_redir	*next;
 }	t_redir;
 
@@ -115,6 +106,7 @@ int		main_expand(t_shell *shell);
 char	*expand_dollar_question(t_shell *shell, char *result);
 char	*expand_key_var(char **str, t_shell *shell, char *result);
 char	*append_char_to_result(char c, char *result);
+char	*expand_var(char *str, t_shell *shell);
 
 // Execution
 void	execute_cmd(t_cmd *cmd, t_shell *shell);

@@ -40,7 +40,6 @@ static int	handle_redir(t_shell *shell, t_cmd *curr, int *i)
 	else
 		redir->fd = 0; //stdin
 	redir->type = shell->tokens[(*i) - 1].type;
-	redir->quote_type = shell->tokens[*i].quote_type;
 	redir->filename = ft_strdup(shell->tokens[*i].value);
 	if (!redir->filename)
 		return (free(redir), print_parse_error(ERR_MEMORY, NULL), ERR_MEMORY);

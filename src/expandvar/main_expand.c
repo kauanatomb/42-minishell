@@ -6,7 +6,7 @@
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/11 10:32:28 by ktombola          #+#    #+#             */
-/*   Updated: 2025/08/26 12:32:28 by ktombola         ###   ########.fr       */
+/*   Updated: 2025/08/29 12:10:18 by ktombola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,43 +24,6 @@ char	*append_char_to_result(char c, char *result)
 	return (result);
 }
 
-char	*expand_var(char *str, t_shell *shell)
-{
-	char	*result;
-
-	result = ft_strdup("");
-	if (!result)
-		return (NULL);
-	while (*str)
-	{
-		if (*str == '$')
-		{
-			str++;
-			if (*str == '?')
-			{
-				result = expand_dollar_question(shell, result);
-				if (!result)
-					return (NULL);
-				str++;
-			}
-			else
-			{
-				result = expand_key_var(&str, shell, result);
-				if (!result)
-					return (NULL);
-			}
-		}
-		else
-		{
-			result = append_char_to_result(*str, result);
-			if (!result)
-				return (NULL);
-			str++;
-		}
-	}
-	return (result);
-}
-
 static int	expand_cmd_argv(t_shell *shell, t_cmd *cmd, int *tok_i)
 {
 	int		i;
@@ -69,14 +32,11 @@ static int	expand_cmd_argv(t_shell *shell, t_cmd *cmd, int *tok_i)
 	i = 0;
 	while (cmd->argv[i])
 	{
-		if (shell->tokens[*tok_i].quote_type != SINGLE)
-		{
-			expanded = expand_var(cmd->argv[i], shell);
-			if (!expanded)
-				return (ERR_MEMORY);
-			free(cmd->argv[i]);
-			cmd->argv[i] = expanded;
-		}
+		expanded = expand_var(cmd->argv[i], shell);
+		if (!expanded)
+			return (ERR_MEMORY);
+		free(cmd->argv[i]);
+		cmd->argv[i] = expanded;
 		i++;
 		(*tok_i)++;
 	}
@@ -91,7 +51,7 @@ static int	expand_cmd_redirs(t_shell *shell, t_cmd *cmd, int *tok_i)
 	r = cmd->redirs;
 	while (r)
 	{
-		if (r->type != HEREDOC && r->quote_type != SINGLE && r->filename)
+		if (r->type != HEREDOC && r->filename)
 		{
 			expanded = expand_var(r->filename, shell);
 			if (!expanded)

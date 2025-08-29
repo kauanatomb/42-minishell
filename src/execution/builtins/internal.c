@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lexer.c                                            :+:      :+:    :+:   */
+/*   internal.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,44 +12,23 @@
 
 #include "minishell.h"
 
-static int	count_tokens(const char *line)
+int builtin_cd(char **argv)
 {
-	int	i;
-	int	count;
-
-	i = 0;
-	count = 0;
-	while (line[i])
-	{
-		if (ft_isspace(line[i]))
-			i++;
-		else if (ft_is_operator(line[i]))
-		{
-			skip_operator(line, &i);
-			count++;
-		}
-		else
-		{
-			skip_word(line, &i);
-			count++;
-		}
-	}
-	return (count);
+    // move throwth folders
 }
 
-int	lex_line(t_shell *shell, const char *line)
+int builtin_exit(char **argv)
 {
-	int	token_count;
+    // act like control d
+}
 
-	token_count = count_tokens(line);
-	shell->num_tokens = token_count;
-	shell->tokens = malloc(sizeof(t_token) * (token_count + 1));
-	if (!shell->tokens)
-		return (ERR_MEMORY);
-	if (tokenize_all(shell, line))
-	{
-		free_tokens(shell->tokens);
-		return (ERR_MEMORY);
-	}
-	return (ERR_NONE);
+int builtin_export(char **argv)
+{
+    // change/add env var
+    
+}
+
+int builtin_unset(char **argv)
+{
+    // remove env var
 }
