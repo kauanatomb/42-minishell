@@ -59,7 +59,7 @@ static int	print_error_exp(t_shell *shell, char *arg)
 	return (shell->error);
 }
 
-static	int	is_valid_key(char *key)
+int	is_valid_key(char *key)
 {
 	int	i;
 

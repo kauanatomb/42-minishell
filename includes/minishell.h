@@ -118,6 +118,7 @@ int		builtin_export(char **argv, t_shell *shell);
 int		builtin_cd(char **argv, t_shell *shell);
 int		builtin_exit(char **argv, t_shell *shell);
 // utils
+int		is_valid_key(char *key);
 char	**split_key_value_env(char *s);
 int		is_created(char *key, char **env);
 int		add_to_env(char **new_env, char ***env, char *l_env, int len);

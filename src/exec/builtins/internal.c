@@ -27,11 +27,3 @@ int	builtin_exit(char **argv, t_shell *shell)
 	// act like control d
 	return (0);
 }
-
-int	builtin_unset(char **argv, t_shell *shell)
-{
-	(void)argv;
-	(void)shell;
-	// remove env var
-	return (0);
-}
