@@ -82,6 +82,7 @@ int		init_shell_env(t_shell *shell, char **envp);
 int		ft_array_len(char **arr);
 void	ft_free_array(char **dest);
 bool	is_line_empty(char *line);
+void	free_shell_env(char **env);
 
 // Signal
 void	signal_receiver(void);
@@ -116,7 +117,7 @@ int		builtin_echo(char **argv);
 int		builtin_unset(char **argv, t_shell *shell);
 int		builtin_export(char **argv, t_shell *shell);
 int		builtin_cd(char **argv, t_shell *shell);
-int		builtin_exit(char **argv, t_shell *shell);
+void	builtin_exit(char **argv, t_shell *shell);
 // utils
 int		is_valid_key(char *key);
 char	**split_key_value_env(char *s);

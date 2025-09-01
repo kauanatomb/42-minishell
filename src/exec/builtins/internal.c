@@ -19,11 +19,3 @@ int	builtin_cd(char **argv, t_shell *shell)
 	// move throwth folders
 	return (0);
 }
-
-int	builtin_exit(char **argv, t_shell *shell)
-{
-	(void)argv;
-	(void)shell;
-	// act like control d
-	return (0);
-}
