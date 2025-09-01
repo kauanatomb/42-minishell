@@ -15,13 +15,10 @@
 int	change_value(char *key, char *value, char **env, int i)
 {
 	char	*new_env;
-	char	*tmp;
+	int		len;
 
-	tmp = ft_strjoin(key, "=");
-	if (!tmp)
-		return (ERR_MEMORY);
-	new_env = ft_strjoin(tmp, value);
-	free(tmp);
+	len = ft_strlen(key) + 1 + ft_strlen(value) + 1;
+	new_env = malloc(len);
 	if (!new_env)
 		return (ERR_MEMORY);
 	free(env[i]);
@@ -97,8 +94,7 @@ int	builtin_export(char **argv, t_shell *shell)
 			change_value(splitted[0], splitted[1], shell->env, idx);
 		else if (create_env(splitted[0], splitted[1], &shell->env) != 0)
 			return (ft_free_array(splitted), ERR_MEMORY);
-		free(splitted[0]);
-		free(splitted[1]);
+		ft_free_array(splitted);
 		i++;
 	}
 	return (shell->error);

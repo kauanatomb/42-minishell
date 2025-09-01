@@ -15,6 +15,7 @@
 
 # include "libft.h"
 # include <stdio.h>
+# include <sys/stat.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <stdbool.h>
@@ -119,6 +120,8 @@ int		builtin_export(char **argv, t_shell *shell);
 int		builtin_cd(char **argv, t_shell *shell);
 void	builtin_exit(char **argv, t_shell *shell);
 // utils
+int		create_env(char *key, char *value, char ***env);
+int		change_value(char *key, char *value, char **env, int i);
 int		is_valid_key(char *key);
 char	**split_key_value_env(char *s);
 int		is_created(char *key, char **env);

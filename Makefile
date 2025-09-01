@@ -17,7 +17,7 @@ SRCS     := src/main/main.c src/main/utils.c src/main/struct.c \
 			src/lexer/utils.c src/parser/parser.c src/parser/utils.c \
 			src/expandvar/main_expand.c src/expandvar/utils.c \
 			src/expandvar/var_expand.c src/exec/execute_cmd.c \
-			src/exec/builtins/external.c src/exec/builtins/internal.c \
+			src/exec/builtins/external.c src/exec/builtins/cd.c \
 			src/exec/builtins/utils.c src/exec/builtins/export.c \
 			src/exec/builtins/unset.c src/exec/builtins/exit.c \
 
