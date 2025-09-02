@@ -43,12 +43,12 @@ int exec_builtin_child(t_cmd *cmd, t_shell *shell)
 
     (void)shell;
     if (!ft_strcmp(name, "echo"))
-        return builtin_echo(cmd->argv);
+        return (builtin_echo(cmd->argv));
     // if (!ft_strcmp(name, "pwd"))
     //     return builtin_pwd();
     // if (!ft_strcmp(name, "env"))
     //     return builtin_env(shell->env);
-    return 1;
+    return (1);
 }
 
 // quick exec external: execvp cannot be used in this project

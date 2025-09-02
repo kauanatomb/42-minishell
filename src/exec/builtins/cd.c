@@ -92,7 +92,8 @@ static int	cd_to_target(t_shell *shell, char *target, char *oldpwd)
 		return (p_error_cd(shell, target, 4), 1);
 	if (chdir(target) == -1)
 		return (p_error_cd(shell, target, 3), 1);
-	update_env_var("OLDPWD", oldpwd, &shell->env);
+	if (oldpwd)
+		update_env_var("OLDPWD", oldpwd, &shell->env);
 	if (getcwd(cwd, sizeof(cwd)))
 		update_env_var("PWD", cwd, &shell->env);
 	return (0);
