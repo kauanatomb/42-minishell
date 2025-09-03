@@ -120,13 +120,14 @@ int		builtin_export(char **argv, t_shell *shell);
 int		builtin_cd(char **argv, t_shell *shell);
 void	builtin_exit(char **argv, t_shell *shell);
 int		builtin_pwd(t_shell *shell);
+int		builtin_env(char **env);
 // utils
 int		create_env(char *key, char *value, char ***env);
 int		change_value(char *key, char *value, char **env, int i);
 bool	is_valid_key(char *key);
 char	**split_key_value_env(char *s);
 int		is_created(char *key, char **env);
-int 	create_env(char *key, char *value, char ***env);
+int		create_env(char *key, char *value, char ***env);
 
 // Global
 extern volatile sig_atomic_t	g_signal;

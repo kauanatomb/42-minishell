@@ -66,20 +66,6 @@ int	update_env_var(char *key, char *value, char ***env)
 	return (create_env(key, value, env));
 }
 
-int	check_directory_access(char *arg)
-{
-	struct stat	info;
-
-	if (!arg)
-		return (0);
-	else if (stat(arg, &info) == 0 && S_ISDIR(info.st_mode))
-		return (0);
-	else if (stat(arg, &info) == 0 && !S_ISDIR(info.st_mode))
-		return (2);
-	else
-		return (1);
-}
-
 static int	cd_to_target(t_shell *shell, char *target, char *oldpwd)
 {
 	char	cwd[10000];

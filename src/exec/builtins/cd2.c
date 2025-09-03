@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   cd2.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,3 +12,16 @@
 
 #include "minishell.h"
 
+int	check_directory_access(char *arg)
+{
+	struct stat	info;
+
+	if (!arg)
+		return (0);
+	else if (stat(arg, &info) == 0 && S_ISDIR(info.st_mode))
+		return (0);
+	else if (stat(arg, &info) == 0 && !S_ISDIR(info.st_mode))
+		return (2);
+	else
+		return (1);
+}
