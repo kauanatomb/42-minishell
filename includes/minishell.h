@@ -128,6 +128,7 @@ bool	is_valid_key(char *key);
 char	**split_key_value_env(char *s);
 int		is_created(char *key, char **env);
 int		create_env(char *key, char *value, char ***env);
+int		check_directory_access(char *arg);
 
 // Global
 extern volatile sig_atomic_t	g_signal;
