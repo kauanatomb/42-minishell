@@ -52,55 +52,64 @@ int	exec_builtin_child(t_cmd *cmd, t_shell *shell)
 	return (1);
 }
 
-// quick exec external: execvp cannot be used in this project
-int	exec_external(t_cmd *cmd, t_shell *shell)
+void exec_external(t_cmd *cmd, t_shell *shell)
 {
-	pid_t	pid;
-	int		status;
+    pid_t pid;
+    int status;
 
-	(void)shell;
-	pid = fork();
+    pid = fork();
 	if (pid == -1)
 		return (perror("fork"), 1);
-	if (pid == 0)
-	{
-		execvp(cmd->argv[0], cmd->argv);
-		perror(cmd->argv[0]);
-		exit(127);
-	}
-	else
-	{
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status))
-			return (WEXITSTATUS(status));
-		return (1);
-	}
+    if (pid == 0)
+    {
+        if (apply_redirs(cmd->redirs) < 0)
+            exit(1);
+        execve_with_path(cmd->argv, shell->env);
+        perror(cmd->argv[0]);
+        exit(127);
+    }
+    else if (pid > 0)
+    {
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status))
+            shell->last_status = WEXITSTATUS(status);
+    }
+    else
+    {
+        perror("fork");
+    }
 }
+
 
 void	execute_cmd(t_cmd *cmd, t_shell *shell)
 {
 	int		status;
 	pid_t	pid;
 
-	(void)shell;
 	if (!cmd || !cmd->argv || !cmd->argv[0])
 		return ;
 	if (!ft_strcmp(cmd->argv[0], "cd") || !ft_strcmp(cmd->argv[0], "exit")
 		|| !ft_strcmp(cmd->argv[0], "export")
 		|| !ft_strcmp(cmd->argv[0], "unset"))
 	{
-		exec_builtin_parent(cmd, shell);
+		shell->error = exec_builtin_parent(cmd, shell);
 	}
 	else if (!ft_strcmp(cmd->argv[0], "echo") || !ft_strcmp(cmd->argv[0], "pwd")
 		|| !ft_strcmp(cmd->argv[0], "env"))
 	{
 		pid = fork();
+		if (pid == -1)
+			return (perror("fork"), 1);
 		if (pid == 0)
+		{
+			if(apply_redirs(cmd->redirs) < 0)
+				exit(1);
 			exit(exec_builtin_child(cmd, shell));
+		}
 		waitpid(pid, &status, 0);
 		if (WIFEXITED(status))
-			(WEXITSTATUS(status));
+			(shell->error = WEXITSTATUS(status));
 	}
 	else
-		exec_external(cmd, shell);
+		shell->error = exec_external(cmd, shell);
 }

@@ -22,6 +22,7 @@
 # include <unistd.h>
 # include <signal.h>
 # include <sys/wait.h>
+# include <fcntl.h>
 
 typedef enum e_error
 {
@@ -113,6 +114,7 @@ char	*expand_var(char *str, t_shell *shell);
 
 // Execution
 void	execute_cmd(t_cmd *cmd, t_shell *shell);
+int		apply_redirs(t_redir *redirs);
 // Builtin
 int		builtin_echo(char **argv);
 int		builtin_unset(char **argv, t_shell *shell);
