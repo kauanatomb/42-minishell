@@ -36,6 +36,19 @@ int	builtin_echo(char **argv)
 	return (0);
 }
 
+static char	*ft_getenv(char *key, char **env)
+{
+	int	idx;
+	char	*ptr;
+
+	idx = is_created(key, env);
+	if (idx < 0)
+		return (NULL);
+	ptr = ft_strchr(env[idx], '=');
+	ft_printf("%s\n", ptr);
+	return (ptr);
+}
+
 int	builtin_pwd(t_shell *shell)
 {
 	char	*pwd;
@@ -60,4 +73,5 @@ int	builtin_pwd(t_shell *shell)
 	}
 	write(STDOUT_FILENO, cwd, ft_strlen(cwd));
 	write(STDOUT_FILENO, "\n", 1);
+	return (0);
 }
