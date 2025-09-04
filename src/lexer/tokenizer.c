@@ -21,11 +21,6 @@ void	skip_operator(const char *line, int *i)
 		(*i)++;
 }
 
-int	ft_is_operator(char c)
-{
-	return (c == '|' || c == '<' || c == '>' || c == '&');
-}
-
 void	skip_word(const char *line, int *i)
 {
 	char	quote;
@@ -60,12 +55,35 @@ static t_token_type	classify_operator(const char *s, int len)
 	return (WORD);
 }
 
+static int	tokenize_one(t_shell *shell, const char *line, int *i, int *j)
+{
+	int		start;
+	int		len;
+	char	*value;
+
+	start = *i;
+	if (ft_is_operator(line[*i]))
+		skip_operator(line, i);
+	else
+		skip_word(line, i);
+	len = *i - start;
+	value = ft_strndup(&line[start], len);
+	if (!value)
+		return (ERR_MEMORY);
+	shell->tokens[*j].value = value;
+	if (ft_is_operator(value[0]))
+		shell->tokens[*j].type = classify_operator(value, len);
+	else
+		shell->tokens[*j].type = WORD;
+	(*j)++;
+	return (ERR_NONE);
+}
+
 int	tokenize_all(t_shell *shell, const char *line)
 {
 	int	i;
 	int	j;
-	int	start;
-	int	len;
+	int	err;
 
 	i = 0;
 	j = 0;
@@ -75,20 +93,9 @@ int	tokenize_all(t_shell *shell, const char *line)
 			i++;
 		else
 		{
-			start = i;
-			if (ft_is_operator(line[i]))
-				skip_operator(line, &i);
-			else
-				skip_word(line, &i);
-			len = i - start;
-			shell->tokens[j].value = ft_strndup(&line[start], len);
-			if (!shell->tokens[j].value)
-				return (ERR_MEMORY);
-			if (ft_is_operator(shell->tokens[j].value[0]))
-				shell->tokens[j].type = classify_operator(shell->tokens[j].value, len);
-			else
-				shell->tokens[j].type = WORD;
-			j++;
+			err = tokenize_one(shell, line, &i, &j);
+			if (err != ERR_NONE)
+				return (err);
 		}
 	}
 	shell->tokens[j].value = NULL;
