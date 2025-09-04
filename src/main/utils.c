@@ -48,10 +48,10 @@ void	free_shell_env(char **env)
 	free(env);
 }
 
-int	exit_ctrld(t_shell *shell)
+void	exit_ctrld(t_shell *shell)
 {
 	free_shell_env(shell->env);
-	write(STDIN_FILENO, "exit\n", 5);
+	write(STDOUT_FILENO, "exit\n", 5);
 	clean_extra_fds();
 	exit(0);
 }

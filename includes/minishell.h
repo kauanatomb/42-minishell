@@ -79,7 +79,7 @@ typedef struct s_shell
 // Main
 int		ft_isspace(char c);
 void	clean_extra_fds(void);
-int		exit_ctrld(t_shell *shell);
+void	exit_ctrld(t_shell *shell);
 int		init_shell_env(t_shell *shell, char **envp);
 int		ft_array_len(char **arr);
 void	ft_free_array(char **dest);
