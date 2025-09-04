@@ -18,11 +18,11 @@ int	apply_redirs(t_redir *redirs)
 
 	while (redirs)
 	{
-		if (redirs->type == OUTPUT) // ">"
+		if (redirs->type == OUTPUT)
 			fd = open(redirs->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		else if (redirs->type == APPEND) // ">>"
+		else if (redirs->type == APPEND)
 			fd = open(redirs->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		else if (redirs->type == INPUT) // "<"
+		else if (redirs->type == INPUT)
 			fd = open(redirs->filename, O_RDONLY);
 		else
 			return (1);

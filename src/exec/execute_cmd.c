@@ -52,35 +52,6 @@ int	exec_builtin_child(t_cmd *cmd, t_shell *shell)
 	return (1);
 }
 
-void exec_external(t_cmd *cmd, t_shell *shell)
-{
-    pid_t pid;
-    int status;
-
-    pid = fork();
-	if (pid == -1)
-		return (perror("fork"), 1);
-    if (pid == 0)
-    {
-        if (apply_redirs(cmd->redirs) < 0)
-            exit(1);
-        execve_with_path(cmd->argv, shell->env);
-        perror(cmd->argv[0]);
-        exit(127);
-    }
-    else if (pid > 0)
-    {
-        waitpid(pid, &status, 0);
-        if (WIFEXITED(status))
-            shell->last_status = WEXITSTATUS(status);
-    }
-    else
-    {
-        perror("fork");
-    }
-}
-
-
 void	execute_cmd(t_cmd *cmd, t_shell *shell)
 {
 	int		status;
@@ -99,10 +70,10 @@ void	execute_cmd(t_cmd *cmd, t_shell *shell)
 	{
 		pid = fork();
 		if (pid == -1)
-			return (perror("fork"), 1);
+			return (perror("fork"));
 		if (pid == 0)
 		{
-			if(apply_redirs(cmd->redirs) < 0)
+			if (apply_redirs(cmd->redirs) < 0)
 				exit(1);
 			exit(exec_builtin_child(cmd, shell));
 		}

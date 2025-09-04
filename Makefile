@@ -21,6 +21,7 @@ SRCS     := src/main/main.c src/main/utils.c src/main/struct.c \
 			src/exec/builtins/export.c src/exec/builtins/exit.c \
 			src/exec/builtins/export2.c src/exec/builtins/cd2.c \
 			src/exec/builtins/unset.c src/exec/execute_redir.c \
+			src/exec/external/exec_external.c \
 
 OBJS     := $(SRCS:.c=.o)
 
