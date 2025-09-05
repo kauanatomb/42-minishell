@@ -42,16 +42,36 @@ int	exec_builtin_child(t_cmd *cmd, t_shell *shell)
 	return (1);
 }
 
-static int	is_builtin_parent(char *cmd)
+int	is_builtin_parent(char *cmd)
 {
 	return (!ft_strcmp(cmd, "cd") || !ft_strcmp(cmd, "exit")
 		|| !ft_strcmp(cmd, "export") || !ft_strcmp(cmd, "unset"));
 }
 
-static int	is_builtin_child(char *cmd)
+int	is_builtin_child(char *cmd)
 {
 	return (!ft_strcmp(cmd, "echo") || !ft_strcmp(cmd, "pwd")
 		|| !ft_strcmp(cmd, "env"));
+}
+
+int	fork_and_exec_builtin(t_cmd *cmd, t_shell *shell)
+{
+	pid_t	pid;
+	int		status;
+
+	pid = fork();
+	if (pid == -1)
+		return (perror("fork"), -1);
+	if (pid == 0)
+	{
+		if (apply_redirs(cmd->redirs) < 0)
+			exit (1);
+		exit(exec_builtin_child(cmd, shell));
+	}
+	waitpid(pid, &status, 0);
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+	return (status);
 }
 
 void	exec_cmd(t_cmd *cmd, t_shell *shell)
@@ -70,7 +90,7 @@ void	exec_cmd(t_cmd *cmd, t_shell *shell)
 	}
 	if (is_builtin_child(cmd->argv[0]))
 	{
-		shell->error = exec_builtin_child(cmd, shell);
+		shell->error = fork_and_exec_builtin(cmd, shell);
 		return ;
 	}
 	shell->error = exec_external(cmd, shell);
