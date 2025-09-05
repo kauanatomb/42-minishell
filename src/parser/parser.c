@@ -76,7 +76,9 @@ int	parse(t_shell *shell)
 	int		err;
 	int		i;
 	int		start;
+	int		cmd_start;
 
+	cmd_start = 0;
 	curr = new_cmd(count_words(shell, 0));
 	if (!curr)
 		return (ERR_PARSE);
@@ -87,7 +89,7 @@ int	parse(t_shell *shell)
 	{
 		if (shell->tokens[i].type == WORD)
 			err = handle_word(curr, shell->tokens[i].value,
-					&start, count_words(shell, 0));
+					&start, count_words(shell, cmd_start));
 		else if (shell->tokens[i].type == INPUT
 			|| shell->tokens[i].type == HEREDOC)
 			err = handle_redir(shell, curr, &i);
@@ -95,7 +97,10 @@ int	parse(t_shell *shell)
 			|| shell->tokens[i].type == APPEND)
 			err = handle_redir(shell, curr, &i);
 		else if (shell->tokens[i].type == PIPE)
+		{
 			err = handle_pipe(shell, &curr, &start, i);
+			cmd_start = i + 1;
+		}
 		if (err != ERR_NONE)
 			return (err);
 		i++;
