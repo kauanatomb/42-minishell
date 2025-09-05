@@ -16,11 +16,11 @@ SRCS     := src/main/main.c src/main/utils.c src/main/struct.c \
 		   	src/signal/handler.c src/lexer/lexer.c src/lexer/tokenizer.c \
 			src/lexer/utils.c src/parser/parser.c src/parser/utils.c \
 			src/expandvar/main_expand.c src/expandvar/utils.c \
-			src/expandvar/var_expand.c src/exec/execute_cmd.c \
+			src/expandvar/var_expand.c src/exec/cmd.c src/exec/pipeline.c \
 			src/exec/builtins/external.c src/exec/builtins/cd.c \
 			src/exec/builtins/export.c src/exec/builtins/exit.c \
 			src/exec/builtins/export2.c src/exec/builtins/cd2.c \
-			src/exec/builtins/unset.c src/exec/execute_redir.c \
+			src/exec/builtins/unset.c src/exec/redir.c \
 			src/exec/external/exec_external.c \
 
 OBJS     := $(SRCS:.c=.o)

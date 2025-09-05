@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   execute_cmd.c                                      :+:      :+:    :+:   */
+/*   cmd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -11,16 +11,6 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int	is_builtin(char *name)
-{
-	if (!name)
-		return (0);
-	return (!ft_strcmp(name, "cd") || !ft_strcmp(name, "exit")
-		|| !ft_strcmp(name, "export") || !ft_strcmp(name, "unset")
-		|| !ft_strcmp(name, "echo") || !ft_strcmp(name, "pwd")
-		|| !ft_strcmp(name, "env"));
-}
 
 int	exec_builtin_parent(t_cmd *cmd, t_shell *shell)
 {
@@ -52,35 +42,36 @@ int	exec_builtin_child(t_cmd *cmd, t_shell *shell)
 	return (1);
 }
 
-void	execute_cmd(t_cmd *cmd, t_shell *shell)
+static int	is_builtin_parent(char *cmd)
 {
-	int		status;
-	pid_t	pid;
+	return (!ft_strcmp(cmd, "cd") || !ft_strcmp(cmd, "exit")
+		|| !ft_strcmp(cmd, "export") || !ft_strcmp(cmd, "unset"));
+}
 
+static int	is_builtin_child(char *cmd)
+{
+	return (!ft_strcmp(cmd, "echo") || !ft_strcmp(cmd, "pwd")
+		|| !ft_strcmp(cmd, "env"));
+}
+
+void	exec_cmd(t_cmd *cmd, t_shell *shell)
+{
 	if (!cmd || !cmd->argv || !cmd->argv[0])
 		return ;
-	if (!ft_strcmp(cmd->argv[0], "cd") || !ft_strcmp(cmd->argv[0], "exit")
-		|| !ft_strcmp(cmd->argv[0], "export")
-		|| !ft_strcmp(cmd->argv[0], "unset"))
+	if (cmd->next)
+	{
+		shell->error = exec_pipeline(cmd, shell);
+		return ;
+	}
+	if (is_builtin_parent(cmd->argv[0]))
 	{
 		shell->error = exec_builtin_parent(cmd, shell);
+		return ;
 	}
-	else if (!ft_strcmp(cmd->argv[0], "echo") || !ft_strcmp(cmd->argv[0], "pwd")
-		|| !ft_strcmp(cmd->argv[0], "env"))
+	if (is_builtin_child(cmd->argv[0]))
 	{
-		pid = fork();
-		if (pid == -1)
-			return (perror("fork"));
-		if (pid == 0)
-		{
-			if (apply_redirs(cmd->redirs) < 0)
-				exit(1);
-			exit(exec_builtin_child(cmd, shell));
-		}
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status))
-			(shell->error = WEXITSTATUS(status));
+		shell->error = exec_builtin_child(cmd, shell);
+		return ;
 	}
-	else
-		shell->error = exec_external(cmd, shell);
+	shell->error = exec_external(cmd, shell);
 }

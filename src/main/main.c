@@ -99,7 +99,7 @@ int	read_line(t_shell *shell)
 	shell->error = check_entry(shell, line);
 	if (shell->error)
 		return (free(line), 0);
-	execute_cmd(shell->cmds, shell);
+	exec_cmd(shell->cmds, shell);
 	free_cmd_list(shell->cmds);
 	free_tokens(shell->tokens);
 	clean_extra_fds();
