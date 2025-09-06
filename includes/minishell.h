@@ -94,6 +94,7 @@ void	skip_word(const char *line, int *i);
 int		tokenize_all(t_shell *shell, const char *line);
 void	free_tokens(t_token *tokens);
 char	*ft_strndup(const char *s, size_t n);
+void	skip_word(const char *line, int *i);
 
 // Parse
 int		parse(t_shell *shell);

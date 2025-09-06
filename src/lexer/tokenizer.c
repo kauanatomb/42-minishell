@@ -21,31 +21,7 @@ void	skip_operator(const char *line, int *i)
 		(*i)++;
 }
 
-int	ft_is_operator(char c)
-{
-	return (c == '|' || c == '<' || c == '>' || c == '&');
-}
-
-void	skip_word(const char *line, int *i)
-{
-	char	quote;
-
-	while (line[*i] && !ft_isspace(line[*i]) && !ft_is_operator(line[*i]))
-	{
-		if (line[*i] == '\'' || line[*i] == '"')
-		{
-			quote = line[(*i)++];
-			while (line[*i] && line[*i] != quote)
-				(*i)++;
-			if (line[*i] == quote)
-				(*i)++;
-		}
-		else
-			(*i)++;
-	}
-}
-
-static t_token_type	classify_operator(const char *s, int len)
+t_token_type	classify_operator(const char *s, int len)
 {
 	if (len == 1 && s[0] == '|')
 		return (PIPE);
@@ -60,12 +36,36 @@ static t_token_type	classify_operator(const char *s, int len)
 	return (WORD);
 }
 
+static int	add_token(t_token *tokens, int *j, const char *start, int len)
+{
+	tokens[*j].value = ft_strndup(start, len);
+	if (!tokens[*j].value)
+		return (ERR_MEMORY);
+	if (ft_is_operator(tokens[*j].value[0]))
+		tokens[*j].type = classify_operator(tokens[*j].value, len);
+	else
+		tokens[*j].type = WORD;
+	(*j)++;
+	return (ERR_NONE);
+}
+
+static int	process_token(t_token *tokens, int *j, const char *line, int *i)
+{
+	int	start;
+
+	start = *i;
+	if (ft_is_operator(line[*i]))
+		skip_operator(line, i);
+	else
+		skip_word(line, i);
+	return (add_token(tokens, j, &line[start], *i - start));
+}
+
 int	tokenize_all(t_shell *shell, const char *line)
 {
 	int	i;
 	int	j;
-	int	start;
-	int	len;
+	int	err;
 
 	i = 0;
 	j = 0;
@@ -75,20 +75,9 @@ int	tokenize_all(t_shell *shell, const char *line)
 			i++;
 		else
 		{
-			start = i;
-			if (ft_is_operator(line[i]))
-				skip_operator(line, &i);
-			else
-				skip_word(line, &i);
-			len = i - start;
-			shell->tokens[j].value = ft_strndup(&line[start], len);
-			if (!shell->tokens[j].value)
-				return (ERR_MEMORY);
-			if (ft_is_operator(shell->tokens[j].value[0]))
-				shell->tokens[j].type = classify_operator(shell->tokens[j].value, len);
-			else
-				shell->tokens[j].type = WORD;
-			j++;
+			err = process_token(shell->tokens, &j, line, &i);
+			if (err)
+				return (err);
 		}
 	}
 	shell->tokens[j].value = NULL;

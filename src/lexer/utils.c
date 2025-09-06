@@ -39,3 +39,27 @@ char	*ft_strndup(const char *s, size_t n)
 	ft_strlcpy(dup, s, n + 1);
 	return (dup);
 }
+
+int	ft_is_operator(char c)
+{
+	return (c == '|' || c == '<' || c == '>' || c == '&');
+}
+
+void	skip_word(const char *line, int *i)
+{
+	char	quote;
+
+	while (line[*i] && !ft_isspace(line[*i]) && !ft_is_operator(line[*i]))
+	{
+		if (line[*i] == '\'' || line[*i] == '"')
+		{
+			quote = line[(*i)++];
+			while (line[*i] && line[*i] != quote)
+				(*i)++;
+			if (line[*i] == quote)
+				(*i)++;
+		}
+		else
+			(*i)++;
+	}
+}
