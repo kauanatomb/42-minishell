@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   redir.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,46 +12,28 @@
 
 #include "minishell.h"
 
-int	ft_array_len(char **arr)
+int	apply_redirs(t_redir *redirs)
 {
-	int	size;
+	int	fd;
 
-	size = 0;
-	while (arr && arr[size])
-		size++;
-	return (size);
-}
-
-int	ft_isspace(char c)
-{
-	return ((c >= 9 && c <= 13) || c == ' ');
-}
-
-void	clean_extra_fds(void)
-{
-	int	i;
-
-	i = 3;
-	while (i < 1024)
-		close(i++);
-}
-
-void	free_shell_env(char **env)
-{
-	int	i;
-
-	if (!env)
-		return ;
-	i = 0;
-	while (env[i])
-		free(env[i++]);
-	free(env);
-}
-
-void	exit_ctrld(t_shell *shell)
-{
-	free_shell_env(shell->env);
-	write(STDOUT_FILENO, "exit\n", 5);
-	clean_extra_fds();
-	exit(0);
+	while (redirs)
+	{
+		if (redirs->type == OUTPUT)
+			fd = open(redirs->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		else if (redirs->type == APPEND)
+			fd = open(redirs->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		else if (redirs->type == INPUT)
+			fd = open(redirs->filename, O_RDONLY);
+		else
+			return (1);
+		if (fd < 0)
+			return (perror(redirs->filename), -1);
+		if (redirs->type == INPUT)
+			dup2(fd, STDIN_FILENO);
+		else
+			dup2(fd, STDOUT_FILENO);
+		close(fd);
+		redirs = redirs->next;
+	}
+	return (0);
 }

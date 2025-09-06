@@ -15,39 +15,18 @@
 int	change_value(char *key, char *value, char **env, int i)
 {
 	char	*new_env;
-	char	*tmp;
+	int		len;
 
-	tmp = ft_strjoin(key, "=");
-	if (!tmp)
-		return (ERR_MEMORY);
-	new_env = ft_strjoin(tmp, value);
-	free(tmp);
+	len = ft_strlen(key) + 1 + ft_strlen(value) + 1;
+	new_env = malloc(len);
 	if (!new_env)
 		return (ERR_MEMORY);
+	ft_strlcpy(new_env, key, len);
+	ft_strlcat(new_env, "=", len);
+	ft_strlcat(new_env, value, len);
 	free(env[i]);
 	env[i] = new_env;
 	return (0);
-}
-
-int	create_env(char *key, char *value, char ***env)
-{
-	int		len;
-	char	*tmp;
-	char	*l_env;
-	char	**new_env;
-
-	len = ft_array_len(*env);
-	tmp = ft_strjoin(key, "=");
-	if (!tmp)
-		return (ERR_MEMORY);
-	l_env = ft_strjoin(tmp, value);
-	free(tmp);
-	if (!l_env)
-		return (ERR_MEMORY);
-	new_env = malloc(sizeof(char *) * (len + 2));
-	if (!new_env)
-		return (free(l_env), ERR_MEMORY);
-	return (add_to_env(new_env, env, l_env, len));
 }
 
 static int	print_error_exp(t_shell *shell, char *arg)
@@ -59,20 +38,42 @@ static int	print_error_exp(t_shell *shell, char *arg)
 	return (shell->error);
 }
 
-int	is_valid_key(char *key)
+bool	is_valid_key(char *key)
 {
 	int	i;
 
 	i = 0;
 	if (!(ft_isalpha(key[0]) || key[0] == '_'))
-		return (0);
+		return (false);
 	while (key[i])
 	{
 		if (!(ft_isalnum(key[i]) || key[i] == '_'))
-			return (0);
+			return (false);
 		i++;
 	}
-	return (1);
+	return (true);
+}
+
+int	builtin_export_print(t_shell *shell)
+{
+	int		i;
+	char	*eq;
+
+	i = 0;
+	while (shell->env[i])
+	{
+		eq = ft_strchr(shell->env[i], '=');
+		if (eq)
+		{
+			*eq = '\0';
+			ft_printf("declare -x %s=\"%s\"\n", shell->env[i], eq + 1);
+			*eq = '=';
+		}
+		else
+			ft_printf("declare -x %s\n", shell->env[i]);
+		i++;
+	}
+	return (0);
 }
 
 int	builtin_export(char **argv, t_shell *shell)
@@ -84,21 +85,28 @@ int	builtin_export(char **argv, t_shell *shell)
 	i = 1;
 	shell->error = 0;
 	if (!argv[i] || is_line_empty(argv[1]))
-		return (0);
+		return (builtin_export_print(shell));
 	while (argv[i])
 	{
 		splitted = split_key_value_env(argv[i]);
 		if (!splitted)
 			return (ERR_MEMORY);
 		if (!is_valid_key(splitted[0]))
-			return (ft_free_array(splitted), print_error_exp(shell, argv[i]));
+		{
+			print_error_exp(shell, argv[i]);
+			ft_free_array(splitted);
+			i++;
+			continue ;
+		}
 		idx = is_created(splitted[0], shell->env);
 		if (idx >= 0)
 			change_value(splitted[0], splitted[1], shell->env, idx);
-		else if (create_env(splitted[0], splitted[1], &shell->env) != 0)
-			return (ft_free_array(splitted), ERR_MEMORY);
-		free(splitted[0]);
-		free(splitted[1]);
+		else
+		{
+			if (create_env(splitted[0], splitted[1], &shell->env) != 0)
+				return (ft_free_array(splitted), ERR_MEMORY);
+		}
+		ft_free_array(splitted);
 		i++;
 	}
 	return (shell->error);

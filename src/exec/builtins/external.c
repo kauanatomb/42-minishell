@@ -35,3 +35,46 @@ int	builtin_echo(char **argv)
 		ft_printf("\n");
 	return (0);
 }
+
+int	builtin_pwd(t_shell *shell)
+{
+	char	*pwd;
+	char	*cwd;
+	char	buf[1024];
+
+	pwd = getenv("PWD");
+	if (pwd)
+	{
+		write(STDOUT_FILENO, pwd, ft_strlen(pwd));
+		write(STDOUT_FILENO, "\n", 1);
+		return (0);
+	}
+	cwd = getcwd(buf, sizeof(buf));
+	if (!cwd)
+	{
+		shell->error = 1;
+		write(2, "pwd: error retrieving current directory: ", 41);
+		write(2, "getcwd: cannot access parent directories:", 41);
+		write(2, " No such file or directory\n", 28);
+		return (1);
+	}
+	write(STDOUT_FILENO, cwd, ft_strlen(cwd));
+	write(STDOUT_FILENO, "\n", 1);
+	return (0);
+}
+
+int	builtin_env(char **env)
+{
+	int		i;
+	char	*ptr;
+
+	i = 0;
+	while (env[i])
+	{
+		ptr = ft_strrchr(env[i], '=');
+		if (ptr)
+			ft_printf("%s\n", env[i]);
+		i++;
+	}
+	return (0);
+}

@@ -43,7 +43,7 @@ void	ft_free_array(char **dest)
 
 static int	create_minimal_env(char **env)
 {
-	char	cwd[1000];
+	char	cwd[10000];
 
 	if (!getcwd(cwd, sizeof(cwd)))
 		return (free(env), 137);

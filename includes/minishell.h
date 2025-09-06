@@ -15,12 +15,14 @@
 
 # include "libft.h"
 # include <stdio.h>
+# include <sys/stat.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <stdbool.h>
 # include <unistd.h>
 # include <signal.h>
 # include <sys/wait.h>
+# include <fcntl.h>
 
 typedef enum e_error
 {
@@ -77,11 +79,12 @@ typedef struct s_shell
 // Main
 int		ft_isspace(char c);
 void	clean_extra_fds(void);
-int		exit_ctrld(t_shell *shell);
+void	exit_ctrld(t_shell *shell);
 int		init_shell_env(t_shell *shell, char **envp);
 int		ft_array_len(char **arr);
 void	ft_free_array(char **dest);
 bool	is_line_empty(char *line);
+void	free_shell_env(char **env);
 
 // Signal
 void	signal_receiver(void);
@@ -111,18 +114,31 @@ char	*append_char_to_result(char c, char *result);
 char	*expand_var(char *str, t_shell *shell);
 
 // Execution
-void	execute_cmd(t_cmd *cmd, t_shell *shell);
+void	exec_cmd(t_cmd *cmd, t_shell *shell);
+int		apply_redirs(t_redir *redirs);
+int		exec_external(t_cmd *cmd, t_shell *shell);
+int		is_builtin_child(char *cmd);
+int		is_builtin_parent(char *cmd);
+int		exec_builtin_child(t_cmd *cmd, t_shell *shell);
 // Builtin
 int		builtin_echo(char **argv);
 int		builtin_unset(char **argv, t_shell *shell);
 int		builtin_export(char **argv, t_shell *shell);
 int		builtin_cd(char **argv, t_shell *shell);
-int		builtin_exit(char **argv, t_shell *shell);
+void	builtin_exit(char **argv, t_shell *shell);
+int		builtin_pwd(t_shell *shell);
+int		builtin_env(char **env);
 // utils
-int		is_valid_key(char *key);
+int		create_env(char *key, char *value, char ***env);
+int		change_value(char *key, char *value, char **env, int i);
+bool	is_valid_key(char *key);
 char	**split_key_value_env(char *s);
 int		is_created(char *key, char **env);
-int		add_to_env(char **new_env, char ***env, char *l_env, int len);
+int		create_env(char *key, char *value, char ***env);
+int		check_directory_access(char *arg);
+
+// pipeline
+int		exec_pipeline(t_cmd *cmd, t_shell *shell);
 
 // Global
 extern volatile sig_atomic_t	g_signal;
