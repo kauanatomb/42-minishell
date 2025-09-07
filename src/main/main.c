@@ -58,12 +58,6 @@ int	check_entry(t_shell *shell, char *line)
 	int	ret;
 
 	ret = lex_line(shell, line);
-	int i = 0;
-	while (shell->tokens[i].value)
-	{
-		printf("value: %s, type:%d\n", shell->tokens[i].value, shell->tokens[i].type);
-		i++;
-	}
 	if (ret != ERR_NONE)
 		return (print_parse_error(ret, NULL), ERR_MEMORY);
 	ret = parse(shell);

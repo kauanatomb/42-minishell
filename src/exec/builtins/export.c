@@ -29,7 +29,7 @@ int	change_value(char *key, char *value, char **env, int i)
 	return (0);
 }
 
-static int	print_error_exp(t_shell *shell, char *arg)
+int	print_error_exp(t_shell *shell, char *arg)
 {
 	write(2, "bash: export: `", 15);
 	write(2, arg, strlen(arg));
