@@ -12,9 +12,9 @@
 
 #include "minishell.h"
 
-int builtin_export_child(char **argv, t_shell *shell)
+int	builtin_export_child(char **argv, t_shell *shell)
 {
-    int		i;
+	int		i;
 	char	**splitted;
 
 	i = 1;

@@ -17,8 +17,8 @@ int exec_builtin_parent_pipes(t_cmd *cmd, t_shell *shell)
 	char	*name;
 
 	name = cmd->argv[0];
-	// if (!ft_strcmp(name, "cd"))
-	// 	return (builtin_cd_child(cmd->argv, shell));
+	if (!ft_strcmp(name, "cd"))
+		return (builtin_cd_child(cmd->argv, shell));
 	// if (!ft_strcmp(name, "exit"))
 	// 	return (builtin_exit_child(cmd->argv, shell), 0);
 	if (!ft_strcmp(name, "export"))

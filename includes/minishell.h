@@ -138,10 +138,13 @@ int		create_env(char *key, char *value, char ***env);
 int		check_directory_access(char *arg);
 int		builtin_export_print(t_shell *shell);
 int		print_error_exp(t_shell *shell, char *arg);
+void	p_error_cd(t_shell *shell, char *s, int type);
+char	*give_env_value(char **env, char *key);
 
 // pipeline
 int		exec_pipeline(t_cmd *cmd, t_shell *shell);
 int 	builtin_export_child(char **argv, t_shell *shell);
+int		builtin_cd_child(char **args, t_shell *shell);
 
 // Global
 extern volatile sig_atomic_t	g_signal;

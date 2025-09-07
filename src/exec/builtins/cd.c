@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-static char	*give_env_value(char **env, char *key)
+char	*give_env_value(char **env, char *key)
 {
 	int	i;
 	int	len;
@@ -28,7 +28,7 @@ static char	*give_env_value(char **env, char *key)
 	return (NULL);
 }
 
-static void	p_error_cd(t_shell *shell, char *s, int type)
+void	p_error_cd(t_shell *shell, char *s, int type)
 {
 	if (type == 1)
 	{
@@ -92,12 +92,12 @@ int	builtin_cd(char **args, t_shell *shell)
 	char	*target;
 	int		ret;
 
+	if (args[1] && args[2])
+		return (p_error_cd(shell, NULL, 2), 1);
 	if (!args[1] || !ft_strcmp(args[1], "--"))
 		target = give_env_value(shell->env, "HOME=");
 	else if (!ft_strcmp(args[1], "-"))
 		target = give_env_value(shell->env, "OLDPWD=");
-	else if (args[2])
-		return (p_error_cd(shell, NULL, 2), 1);
 	else
 		target = ft_strdup(args[1]);
 	if (!target || !*target)
