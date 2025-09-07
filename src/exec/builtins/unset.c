@@ -73,3 +73,22 @@ int	builtin_unset(char **argv, t_shell *shell)
 	}
 	return (shell->error);
 }
+
+int	builtin_unset_child(char **argv, t_shell *shell)
+{
+	int		i;
+	char	*key;
+
+	i = 1;
+	shell->error = 0;
+	if (!argv[i] || is_line_empty(argv[1]))
+		return (0);
+	while (argv[i])
+	{
+		key = argv[i];
+		if (!is_valid_key(key))
+			print_error_unset(shell, key);
+		i++;
+	}
+	return (shell->error);
+}

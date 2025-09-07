@@ -145,6 +145,7 @@ char	*give_env_value(char **env, char *key);
 int		exec_pipeline(t_cmd *cmd, t_shell *shell);
 int 	builtin_export_child(char **argv, t_shell *shell);
 int		builtin_cd_child(char **args, t_shell *shell);
+int		builtin_unset_child(char **argv, t_shell *shell);
 
 // Global
 extern volatile sig_atomic_t	g_signal;
