@@ -27,6 +27,7 @@
 typedef enum e_error
 {
 	ERR_PIPE = -1,
+	ERR_FORK = -1,
 	ERR_NONE,
 	ERR_MEMORY = 1,
 	ERR_MISS_FILENAME = 2,
@@ -144,7 +145,7 @@ int		builtin_export_print(t_shell *shell);
 int		print_error_exp(t_shell *shell, char *arg);
 void	p_error_cd(t_shell *shell, char *s, int type);
 char	*give_env_value(char **env, char *key);
-
+int		has_heredocs(t_cmd *cmd);
 // pipeline
 int		exec_pipeline(t_cmd *cmd, t_shell *shell);
 int 	builtin_export_child(char **argv, t_shell *shell);
