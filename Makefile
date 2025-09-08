@@ -22,7 +22,7 @@ SRCS     := src/main/main.c src/main/utils.c src/main/struct.c \
 			src/exec/builtins/export2.c src/exec/builtins/cd2.c \
 			src/exec/builtins/unset.c src/exec/redir.c \
 			src/exec/external_program/exec.c src/exec/pipeline.c \
-			src/exec/builtins/export3.c \
+			src/exec/builtins/export3.c src/exec/heredoc.c \
 
 OBJS     := $(SRCS:.c=.o)
 

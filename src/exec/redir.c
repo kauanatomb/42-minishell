@@ -12,6 +12,14 @@
 
 #include "minishell.h"
 
+int	get_input_fd(t_redir *redirs)
+{
+	if (redirs->fd != 0)
+		return (redirs->fd);
+	else
+		return (open(redirs->filename, O_RDONLY));
+}
+
 int	apply_redirs(t_redir *redirs)
 {
 	int	fd;
@@ -23,7 +31,7 @@ int	apply_redirs(t_redir *redirs)
 		else if (redirs->type == APPEND)
 			fd = open(redirs->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 		else if (redirs->type == INPUT)
-			fd = open(redirs->filename, O_RDONLY);
+			fd = get_input_fd(redirs);
 		else
 			return (1);
 		if (fd < 0)

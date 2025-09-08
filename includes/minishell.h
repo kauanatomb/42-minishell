@@ -26,6 +26,7 @@
 
 typedef enum e_error
 {
+	ERR_PIPE = -1,
 	ERR_NONE,
 	ERR_MEMORY = 1,
 	ERR_MISS_FILENAME = 2,
@@ -120,6 +121,7 @@ int		exec_external(t_cmd *cmd, t_shell *shell);
 int		is_builtin_child(char *cmd);
 int		is_builtin_parent(char *cmd);
 int		exec_builtin_child(t_cmd *cmd, t_shell *shell);
+int		prepare_heredocs(t_cmd *cmd);
 // Builtin
 int		builtin_echo(char **argv);
 int		builtin_unset(char **argv, t_shell *shell);

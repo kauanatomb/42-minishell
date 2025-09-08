@@ -78,6 +78,11 @@ void	exec_cmd(t_cmd *cmd, t_shell *shell)
 {
 	if (!cmd || !cmd->argv || !cmd->argv[0])
 		return ;
+	if (prepare_heredocs(cmd) < 0)
+	{
+		shell->error = ERR_PIPE;
+		return ;
+	}
 	if (cmd->next)
 	{
 		shell->error = exec_pipeline(cmd, shell);
