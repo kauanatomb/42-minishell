@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-static int	handle_word(t_cmd *cmd, char *word, int *pos, int max_words)
+static int	handle_w(t_cmd *cmd, char *word, int *pos, int max_words)
 {
 	if (*pos >= max_words)
 		return (print_parse_error(ERR_PARSE, NULL), ERR_PARSE);
@@ -23,46 +23,13 @@ static int	handle_word(t_cmd *cmd, char *word, int *pos, int max_words)
 	return (ERR_NONE);
 }
 
-static int	handle_redir(t_shell *shell, t_cmd *curr, int *i)
-{
-	t_redir	*redir;
-	t_redir	*last;
-
-	(*i)++;
-	if (*i >= shell->num_tokens || shell->tokens[*i].type != WORD)
-		return (print_parse_error(ERR_MISS_FILENAME, NULL), ERR_MISS_FILENAME);
-	redir = malloc(sizeof(t_redir));
-	if (!redir)
-		return (print_parse_error(ERR_MEMORY, NULL), ERR_MEMORY);
-	if (shell->tokens[(*i) - 1].type == OUTPUT
-		|| shell->tokens[(*i) - 1].type == APPEND)
-		redir->fd = 1; // stdout
-	else
-		redir->fd = 0; //stdin
-	redir->type = shell->tokens[(*i) - 1].type;
-	redir->filename = ft_strdup(shell->tokens[*i].value);
-	if (!redir->filename)
-		return (free(redir), print_parse_error(ERR_MEMORY, NULL), ERR_MEMORY);
-	redir->next = NULL;
-	if (!curr->redirs)
-		curr->redirs = redir;
-	else
-	{
-		last = curr->redirs;
-		while (last->next)
-			last = last->next;
-		last->next = redir;
-	}
-	return (ERR_NONE);
-}
-
 static int	handle_pipe(t_shell *shell, t_cmd **curr, int *start, int i)
 {
 	if (*start == 0 || i + 1 >= shell->num_tokens
 		|| shell->tokens[i + 1].type == PIPE)
 		return (print_parse_error(ERR_UNEXPECTED_TOKEN, &shell->tokens[i]),
 			ERR_UNEXPECTED_TOKEN);
-	(*curr)->next = new_cmd(count_words(shell, i + 1));
+	(*curr)->next = new_cmd(countword(shell, i + 1));
 	if (!(*curr)->next)
 		return (print_parse_error(ERR_MEMORY, NULL), ERR_MEMORY);
 	*curr = (*curr)->next;
@@ -70,40 +37,68 @@ static int	handle_pipe(t_shell *shell, t_cmd **curr, int *start, int i)
 	return (ERR_NONE);
 }
 
+static int	handle_redir(t_cmd *curr, t_token *redir_tok,
+				t_token *file_tok)
+{
+	t_redir	*redir;
+
+	if (!file_tok || file_tok->type != WORD)
+		return (print_parse_error(ERR_MISS_FILENAME, NULL), ERR_MISS_FILENAME);
+	redir = malloc(sizeof(t_redir));
+	if (!redir)
+		return (print_parse_error(ERR_MEMORY, NULL), ERR_MEMORY);
+	if (redir_tok->type == OUTPUT || redir_tok->type == APPEND)
+		redir->fd = 1;
+	else
+		redir->fd = 0;
+	redir->type = redir_tok->type;
+	redir->filename = ft_strdup(file_tok->value);
+	if (!redir->filename)
+	{
+		free(redir);
+		return (print_parse_error(ERR_MEMORY, NULL), ERR_MEMORY);
+	}
+	redir->next = NULL;
+	attach_redir(redir, curr);
+	return (ERR_NONE);
+}
+
+static int	parse_tokens(t_shell *shell, int i, int start, int cmd_start)
+{
+	t_token		tok;
+	t_cmd		*curr;
+	int			err;
+
+	if (i >= shell->num_tokens)
+		return (ERR_NONE);
+	curr = get_last_cmd(shell);
+	tok = shell->tokens[i];
+	err = 0;
+	if (tok.type == WORD)
+		err = handle_w(curr, tok.value, &start, countword(shell, cmd_start));
+	else if (tok.type == INPUT || tok.type == HEREDOC
+		|| tok.type == OUTPUT || tok.type == APPEND)
+	{
+		err = handle_redir(curr, &shell->tokens[i], &shell->tokens[i + 1]);
+		i++;
+	}
+	else if (tok.type == PIPE)
+	{
+		err = handle_pipe(shell, &curr, &start, i);
+		cmd_start = i + 1;
+	}
+	if (err != ERR_NONE)
+		return (err);
+	return (parse_tokens(shell, i + 1, start, cmd_start));
+}
+
 int	parse(t_shell *shell)
 {
 	t_cmd	*curr;
-	int		err;
-	int		i;
-	int		start;
-	int		cmd_start;
 
-	cmd_start = 0;
-	curr = new_cmd(count_words(shell, 0));
+	curr = new_cmd(countword(shell, 0));
 	if (!curr)
 		return (ERR_PARSE);
 	shell->cmds = curr;
-	i = 0;
-	start = 0;
-	while (i < shell->num_tokens)
-	{
-		if (shell->tokens[i].type == WORD)
-			err = handle_word(curr, shell->tokens[i].value,
-					&start, count_words(shell, cmd_start));
-		else if (shell->tokens[i].type == INPUT
-			|| shell->tokens[i].type == HEREDOC)
-			err = handle_redir(shell, curr, &i);
-		else if (shell->tokens[i].type == OUTPUT
-			|| shell->tokens[i].type == APPEND)
-			err = handle_redir(shell, curr, &i);
-		else if (shell->tokens[i].type == PIPE)
-		{
-			err = handle_pipe(shell, &curr, &start, i);
-			cmd_start = i + 1;
-		}
-		if (err != ERR_NONE)
-			return (err);
-		i++;
-	}
-	return (ERR_NONE);
+	return (parse_tokens(shell, 0, 0, 0));
 }

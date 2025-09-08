@@ -104,8 +104,10 @@ void	skip_word(const char *line, int *i);
 int		parse(t_shell *shell);
 void	print_parse_error(t_error code, t_token *token);
 void	free_cmd_list(t_cmd *cmds);
-int		count_words(t_shell *shell, int start);
+int		countword(t_shell *shell, int start);
 t_cmd	*new_cmd(int counted_words);
+void	attach_redir(t_redir *redir, t_cmd *curr);
+t_cmd	*get_last_cmd(t_shell *shell);
 
 // Expand var
 int		main_expand(t_shell *shell);

@@ -57,7 +57,7 @@ void	print_parse_error(t_error code, t_token *token)
 		ft_putstr_fd("minishell: parse error\n", 2);
 }
 
-int	count_words(t_shell *shell, int start)
+int	countword(t_shell *shell, int start)
 {
 	int	count;
 
