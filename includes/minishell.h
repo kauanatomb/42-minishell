@@ -124,7 +124,7 @@ int		exec_external(t_cmd *cmd, t_shell *shell);
 int		is_builtin_child(char *cmd);
 int		is_builtin_parent(char *cmd);
 int		exec_builtin_child(t_cmd *cmd, t_shell *shell);
-int		prepare_heredocs(t_cmd *cmd);
+int		prepare_heredocs(t_cmd *cmd, t_shell *shell);
 // Builtin
 int		builtin_echo(char **argv);
 int		builtin_unset(char **argv, t_shell *shell);

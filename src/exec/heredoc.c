@@ -27,7 +27,7 @@ void	sigint_heredoc(int sig)
 	write(STDOUT_FILENO, "\n", 1);
 	rl_replace_line("", 0);
 	rl_on_new_line();
-	rl_redisplay();
+	close(STDIN_FILENO);
 }
 
 int	has_heredocs(t_cmd *cmd)
@@ -48,59 +48,68 @@ int	has_heredocs(t_cmd *cmd)
 	return (0);
 }
 
-int	run_heredoc_child(t_redir *r, int pipe_fd[2])
+int	run_heredoc_child(t_redir *r, int pipe_fd, t_shell *shell)
 {
 	char *line;
 
+	(void)shell;
 	signal(SIGINT, sigint_heredoc);
-	close(pipe_fd[0]);
 	while (1)
 	{
 		line = readline("> ");
 		if (!line || ft_strcmp(line, r->filename) == 0)
 		{
-			if (!line && g_signal != 130)
-				ft_warning_heredoc(r->filename);
-			if (line)
+			if (g_signal == 130)
+			{
+				close(pipe_fd);
 				free(line);
+				exit(130);
+			}
+			if (!line)
+				ft_warning_heredoc(r->filename);
+			free(line);
 			break ;
 		}
-		write(pipe_fd[1], line, ft_strlen(line));
-		write(pipe_fd[1], "\n", 1);
+		// line = check_expand_heredoc(shell, line);
+		write(pipe_fd, line, ft_strlen(line));
+		write(pipe_fd, "\n", 1);
 		free(line);
 	}
-	close(pipe_fd[1]);
-	if (g_signal == 130)
-		exit(130);
+	close(pipe_fd);
 	exit(0);
 }
 
-int	prepare_heredoc_one(t_redir *r)
+int	prepare_heredoc_one(t_redir *r, t_shell *shell)
 {
 	int		pipe_fd[2];
 	pid_t	pid;
 	int		status;
+	int		saved_stdin;
 
+	saved_stdin = dup(STDIN_FILENO);
 	if (pipe(pipe_fd) == -1)
 		return (perror("pipe"), ERR_PIPE);
 	pid = fork();
 	if (pid == -1)
 		return (perror("fork"), ERR_FORK);
 	if (pid == 0)
-		run_heredoc_child(r, pipe_fd);
-	close(pipe_fd[1]);
+		run_heredoc_child(r, pipe_fd[1], shell);
 	waitpid(pid, &status, 0);
+	close(pipe_fd[1]);
 	if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
 	{
-		close(pipe_fd[0]);
-		return (130);
+		dup2(saved_stdin, STDIN_FILENO);
+		printf("test\n");
+		close(saved_stdin);
+		return (clean_extra_fds(), 130);
 	}
+	printf("test 1\n");
 	r->fd = pipe_fd[0];
 	r->type = INPUT;
 	return (0);
 }
 
-int	prepare_heredocs(t_cmd *cmd)
+int	prepare_heredocs(t_cmd *cmd, t_shell *shell)
 {
 	t_redir	*r;
 	int		ret;
@@ -112,7 +121,7 @@ int	prepare_heredocs(t_cmd *cmd)
 		{
 			if (r->type == HEREDOC)
 			{
-				ret = prepare_heredoc_one(r);
+				ret = prepare_heredoc_one(r, shell);
 				if (ret != 0)
 					return (ret);
 			}
