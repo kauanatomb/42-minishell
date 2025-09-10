@@ -64,7 +64,7 @@ static pid_t	spawn_pipeline_child(t_cmd *cmd, int fd_in, int fd[2],
 	return (pid);
 }
 
-static int	wait_pipeline_children(pid_t last_pid)
+int	wait_children(pid_t last_pid)
 {
 	int		status;
 	int		exit_code;
@@ -111,6 +111,6 @@ int	exec_pipeline(t_cmd *cmd, t_shell *shell)
 		}
 		cmd = cmd->next;
 	}
-	status = wait_pipeline_children(pid);
+	status = wait_children(pid);
 	return (status);
 }

@@ -25,7 +25,7 @@ static int	update_mode(char c, int mode)
 	return (mode);
 }
 
-static char	*handle_dollar(char **str, char *result, t_shell *shell, int mode)
+char	*handle_dollar(char **str, char *result, t_shell *shell, int mode)
 {
 	if (mode == 1)
 	{
@@ -45,7 +45,7 @@ static char	*handle_dollar(char **str, char *result, t_shell *shell, int mode)
 	return (result);
 }
 
-static char	*append_and_check(char c, char *result)
+char	*append_and_check(char c, char *result)
 {
 	result = append_char_to_result(c, result);
 	if (!result)

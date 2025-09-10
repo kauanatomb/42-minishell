@@ -20,42 +20,36 @@ void	ft_warning_heredoc(char *args)
 	write(2, "')\n", 3);
 }
 
-int	has_heredocs(t_cmd *cmd)
+int	handle_heredoc_line_end(char *line, char *filename)
 {
-	t_redir	*r;
-
-	while (cmd)
+	if (!line || ft_strcmp(line, filename) == 0)
 	{
-		r = cmd->redirs;
-		while (r)
-		{
-			if (r->type == HEREDOC)
-				return (1);
-			r = r->next;
-		}
-		cmd = cmd->next;
+		if (!line)
+			ft_warning_heredoc(filename);
+		if (line)
+			free(line);
+		return (1);
 	}
-	return (0);
+	else
+		return (0);
 }
 
-int	run_heredoc_child(t_redir *r, int pipe_fd, t_shell *shell)
+void	run_heredoc_child(t_redir *r, int pipe_fd, t_shell *shell)
 {
 	char	*line;
 
-	(void)shell;
 	signal(SIGINT, SIG_DFL);
 	while (1)
 	{
 		line = readline("> ");
-		if (!line || ft_strcmp(line, r->filename) == 0)
-		{
-			if (!line)
-				ft_warning_heredoc(r->filename);
-			if (line)
-				free(line);
+		if (handle_heredoc_line_end(line, r->filename))
 			break ;
+		line = check_expand_heredoc(r, line, shell);
+		if (!line)
+		{
+			close(pipe_fd);
+			exit(ERR_MEMORY);
 		}
-		line = check_expand_heredoc(shell, line);
 		write(pipe_fd, line, ft_strlen(line));
 		write(pipe_fd, "\n", 1);
 		free(line);
@@ -79,16 +73,13 @@ int	prepare_heredoc_one(t_redir *r, t_shell *shell)
 	if (pid == 0)
 		run_heredoc_child(r, pipe_fd[1], shell);
 	close(pipe_fd[1]);
-	waitpid(pid, &status, 0);
-	signal(SIGINT, handle_sig);
-	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
-	{
+	status = wait_children(pid);
+	if (status)
 		write(STDOUT_FILENO, "\n", 1);
-		return (clean_extra_fds(), 130);
-	}
+	signal(SIGINT, handle_sig);
 	r->fd = pipe_fd[0];
 	r->type = INPUT;
-	return (0);
+	return (status);
 }
 
 int	prepare_heredocs(t_cmd *cmd, t_shell *shell)

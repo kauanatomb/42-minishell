@@ -26,10 +26,10 @@
 
 typedef enum e_error
 {
-	ERR_PIPE = -1,
-	ERR_FORK = -1,
+	ERR_PIPE = -3,
+	ERR_FORK = -2,
+	ERR_MEMORY = -1,
 	ERR_NONE,
-	ERR_MEMORY = 1,
 	ERR_MISS_FILENAME = 2,
 	ERR_UNEXPECTED_TOKEN = 2,
 	ERR_PARSE,
@@ -118,7 +118,8 @@ char	*expand_dollar_question(t_shell *shell, char *result);
 char	*expand_key_var(char **str, t_shell *shell, char *result);
 char	*append_char_to_result(char c, char *result);
 char	*expand_var(char *str, t_shell *shell);
-
+char	*handle_dollar(char **str, char *result, t_shell *shell, int mode);
+char	*append_and_check(char c, char *result);
 // Execution
 void	exec_cmd(t_cmd *cmd, t_shell *shell);
 int		apply_redirs(t_redir *redirs);
@@ -147,6 +148,8 @@ int		builtin_export_print(t_shell *shell);
 int		print_error_exp(t_shell *shell, char *arg);
 void	p_error_cd(t_shell *shell, char *s, int type);
 char	*give_env_value(char **env, char *key);
+// heredocs
+char    *check_expand_heredoc(t_redir *r, char *line, t_shell *shell);
 int		has_heredocs(t_cmd *cmd);
 // pipeline
 int		exec_pipeline(t_cmd *cmd, t_shell *shell);
@@ -154,6 +157,7 @@ int		builtin_export_child(char **argv, t_shell *shell);
 int		builtin_cd_child(char **args, t_shell *shell);
 int		builtin_unset_child(char **argv, t_shell *shell);
 void	builtin_exit_child(char **argv, t_shell *shell);
+int		wait_children(pid_t last_pid);
 
 // Global
 extern volatile sig_atomic_t	g_signal;
