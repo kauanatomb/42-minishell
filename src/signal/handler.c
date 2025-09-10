@@ -16,9 +16,8 @@ void	handle_sig(int sig)
 {
 	int	ret;
 
-	(void)sig;
 	ret = g_signal;
-	g_signal = 130;
+	g_signal = 128 + sig;
 	write(STDIN_FILENO, "\n", 1);
 	rl_replace_line("", 0);
 	rl_on_new_line();

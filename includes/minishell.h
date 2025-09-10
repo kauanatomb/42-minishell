@@ -90,6 +90,7 @@ void	free_shell_env(char **env);
 
 // Signal
 void	signal_receiver(void);
+void	handle_sig(int sig);
 
 // Lexer
 int		lex_line(t_shell *shell, const char *line);
@@ -148,7 +149,7 @@ char	*give_env_value(char **env, char *key);
 int		has_heredocs(t_cmd *cmd);
 // pipeline
 int		exec_pipeline(t_cmd *cmd, t_shell *shell);
-int 	builtin_export_child(char **argv, t_shell *shell);
+int		builtin_export_child(char **argv, t_shell *shell);
 int		builtin_cd_child(char **args, t_shell *shell);
 int		builtin_unset_child(char **argv, t_shell *shell);
 void	builtin_exit_child(char **argv, t_shell *shell);

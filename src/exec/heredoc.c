@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipeline.c                                         :+:      :+:    :+:   */
+/*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -18,16 +18,6 @@ void	ft_warning_heredoc(char *args)
 	write(2, "by end-of-file (wanted `", 24);
 	write(2, args, ft_strlen(args));
 	write(2, "')\n", 3);
-}
-
-void	sigint_heredoc(int sig)
-{
-	(void)sig;
-	g_signal = 130;
-	write(STDOUT_FILENO, "\n", 1);
-	rl_replace_line("", 0);
-	rl_on_new_line();
-	close(STDIN_FILENO);
 }
 
 int	has_heredocs(t_cmd *cmd)
@@ -50,27 +40,22 @@ int	has_heredocs(t_cmd *cmd)
 
 int	run_heredoc_child(t_redir *r, int pipe_fd, t_shell *shell)
 {
-	char *line;
+	char	*line;
 
 	(void)shell;
-	signal(SIGINT, sigint_heredoc);
+	signal(SIGINT, SIG_DFL);
 	while (1)
 	{
 		line = readline("> ");
 		if (!line || ft_strcmp(line, r->filename) == 0)
 		{
-			if (g_signal == 130)
-			{
-				close(pipe_fd);
-				free(line);
-				exit(130);
-			}
 			if (!line)
 				ft_warning_heredoc(r->filename);
-			free(line);
+			if (line)
+				free(line);
 			break ;
 		}
-		// line = check_expand_heredoc(shell, line);
+		line = check_expand_heredoc(shell, line);
 		write(pipe_fd, line, ft_strlen(line));
 		write(pipe_fd, "\n", 1);
 		free(line);
@@ -84,26 +69,23 @@ int	prepare_heredoc_one(t_redir *r, t_shell *shell)
 	int		pipe_fd[2];
 	pid_t	pid;
 	int		status;
-	int		saved_stdin;
 
-	saved_stdin = dup(STDIN_FILENO);
 	if (pipe(pipe_fd) == -1)
 		return (perror("pipe"), ERR_PIPE);
+	signal(SIGINT, SIG_IGN);
 	pid = fork();
 	if (pid == -1)
-		return (perror("fork"), ERR_FORK);
+		return (signal(SIGINT, handle_sig), perror("fork"), ERR_FORK);
 	if (pid == 0)
 		run_heredoc_child(r, pipe_fd[1], shell);
-	waitpid(pid, &status, 0);
 	close(pipe_fd[1]);
-	if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
+	waitpid(pid, &status, 0);
+	signal(SIGINT, handle_sig);
+	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
 	{
-		dup2(saved_stdin, STDIN_FILENO);
-		printf("test\n");
-		close(saved_stdin);
+		write(STDOUT_FILENO, "\n", 1);
 		return (clean_extra_fds(), 130);
 	}
-	printf("test 1\n");
 	r->fd = pipe_fd[0];
 	r->type = INPUT;
 	return (0);

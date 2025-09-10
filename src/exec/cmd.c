@@ -100,4 +100,5 @@ void	exec_cmd(t_cmd *cmd, t_shell *shell)
 		return ;
 	}
 	shell->error = exec_external(cmd, shell);
+	g_signal = 0;
 }
