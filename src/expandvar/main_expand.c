@@ -43,6 +43,32 @@ static int	expand_cmd_argv(t_shell *shell, t_cmd *cmd, int *tok_i)
 	return (ERR_NONE);
 }
 
+static char	*expand_heredoc(char *delimiter, t_redir *r)
+{
+	int		i;
+	int		j;
+	char	*exp_delimiter;
+	char	quote_type;
+
+	i = 0;
+	j = 0;
+	quote_type = 0;
+	exp_delimiter = malloc(ft_strlen(delimiter) + 1);
+	while (delimiter[i])
+	{
+		if ((delimiter[i] == '\'' && !quote_type)
+			|| (delimiter[i] == '"' && !quote_type))
+			quote_type = delimiter[i];
+		if (delimiter[i] != quote_type || !quote_type)
+			exp_delimiter[j++] = delimiter[i];
+		i++;
+	}
+	if (!quote_type)
+		r->heredoc_exp = 1;
+	exp_delimiter[j] = 0;
+	return (exp_delimiter);
+}
+
 static int	expand_cmd_redirs(t_shell *shell, t_cmd *cmd, int *tok_i)
 {
 	t_redir	*r;
@@ -51,9 +77,12 @@ static int	expand_cmd_redirs(t_shell *shell, t_cmd *cmd, int *tok_i)
 	r = cmd->redirs;
 	while (r)
 	{
-		if (r->type != HEREDOC && r->filename)
+		if (r->filename)
 		{
-			expanded = expand_var(r->filename, shell);
+			if (r->type != HEREDOC)
+				expanded = expand_var(r->filename, shell);
+			else
+				expanded = expand_heredoc(r->filename, r);
 			if (!expanded)
 				return (ERR_MEMORY);
 			free(r->filename);

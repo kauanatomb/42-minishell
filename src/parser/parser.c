@@ -52,12 +52,10 @@ static int	handle_redir(t_cmd *curr, t_token *redir_tok,
 	else
 		redir->fd = 0;
 	redir->type = redir_tok->type;
+	redir->heredoc_exp = 0;
 	redir->filename = ft_strdup(file_tok->value);
 	if (!redir->filename)
-	{
-		free(redir);
-		return (print_parse_error(ERR_MEMORY, NULL), ERR_MEMORY);
-	}
+		return (free(redir), print_parse_error(ERR_MEMORY, NULL), ERR_MEMORY);
 	redir->next = NULL;
 	attach_redir(redir, curr);
 	return (ERR_NONE);
