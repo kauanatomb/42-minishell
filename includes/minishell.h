@@ -153,13 +153,15 @@ char	*check_expand_heredoc(t_redir *r, char *line, t_shell *shell);
 int		has_heredocs(t_cmd *cmd);
 void	ft_warning_heredoc(char *args);
 int		handle_heredoc_line_end(char *line, char *filename);
+int		handle_fork_error(void);
 // pipeline
 int		exec_pipeline(t_cmd *cmd, t_shell *shell);
 int		builtin_export_child(char **argv, t_shell *shell);
 int		builtin_cd_child(char **args, t_shell *shell);
 int		builtin_unset_child(char **argv, t_shell *shell);
 void	builtin_exit_child(char **argv, t_shell *shell);
-int		wait_children(pid_t last_pid);
+int		wait_children(pid_t last_pid, int *signal_happened);
+void	handle_pipeline_signal(int status, int signal_happened);
 
 // Global
 extern volatile sig_atomic_t	g_signal;

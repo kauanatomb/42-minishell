@@ -21,9 +21,9 @@ SRCS     := src/main/main.c src/main/utils.c src/main/struct.c \
 			src/exec/builtins/export.c src/exec/builtins/exit.c \
 			src/exec/builtins/export2.c src/exec/builtins/cd2.c \
 			src/exec/builtins/unset.c src/exec/redir.c \
-			src/exec/external_program/exec.c src/exec/pipeline.c \
-			src/exec/builtins/export3.c src/exec/heredoc.c  \
-			src/exec/heredoc2.c \
+			src/exec/external_program/exec.c src/exec/builtins/export3.c \
+			src/exec/heredoc.c src/exec/heredoc2.c \
+			src/exec/pipeline.c src/exec/pipeline2.c \
 
 OBJS     := $(SRCS:.c=.o)
 

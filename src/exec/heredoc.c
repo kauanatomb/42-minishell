@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-static int	handle_fork_error(void)
+int	handle_fork_error(void)
 {
 	signal(SIGINT, handle_sig);
 	perror("fork");
@@ -56,6 +56,7 @@ int	prepare_heredoc_one(t_redir *r, t_shell *shell)
 	int		pipe_fd[2];
 	pid_t	pid;
 	int		status;
+	int		i;
 
 	if (pipe(pipe_fd) == -1)
 		return (perror("pipe"), ERR_PIPE);
@@ -66,7 +67,7 @@ int	prepare_heredoc_one(t_redir *r, t_shell *shell)
 	if (pid == 0)
 		run_heredoc_child(r, pipe_fd[1], shell);
 	close(pipe_fd[1]);
-	status = wait_children(pid);
+	status = wait_children(pid, &i);
 	signal(SIGINT, handle_sig);
 	if (status != ERR_NONE)
 		handle_heredoc_failure(r);

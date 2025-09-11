@@ -73,6 +73,8 @@ static void	exec_external_child(t_cmd *cmd, t_shell *shell)
 {
 	char	*cmd_path;
 
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
 	if (apply_redirs(cmd->redirs) < 0)
 		exit(1);
 	cmd_path = find_command_path(cmd->argv[0], shell->env);
@@ -93,18 +95,18 @@ int	exec_external(t_cmd *cmd, t_shell *shell)
 {
 	pid_t	pid;
 	int		status;
+	int		signal_happened;
 
+	signal(SIGINT, SIG_IGN);
+	signal_happened = 0;
 	pid = fork();
 	status = 1;
 	if (pid == -1)
 		return (perror("fork"), status);
 	if (pid == 0)
 		exec_external_child(cmd, shell);
-	if (waitpid(pid, &status, 0) == -1)
-		return (perror("waitpid"), status);
-	if (WIFEXITED(status))
-		return (WEXITSTATUS(status));
-	if (WIFSIGNALED(status))
-		return (128 + WTERMSIG(status));
+	status = wait_children(pid, &signal_happened);
+	signal(SIGINT, handle_sig);
+	handle_pipeline_signal(status, signal_happened);
 	return (status);
 }

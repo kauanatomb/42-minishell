@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-int exec_builtin_parent_pipes(t_cmd *cmd, t_shell *shell)
+int	exec_builtin_parent_pipes(t_cmd *cmd, t_shell *shell)
 {
 	char	*name;
 
@@ -28,89 +28,86 @@ int exec_builtin_parent_pipes(t_cmd *cmd, t_shell *shell)
 	return (1);
 }
 
-
-static pid_t	spawn_pipeline_child(t_cmd *cmd, int fd_in, int fd[2],
-			t_shell *shell)
+int	run_pipeline_child(t_cmd *cmd, int fd_in, int fd[2], t_shell *shell)
 {
-	pid_t	pid;
-
-	pid = fork();
-	if (pid == -1)
-		return (-1);
-	if (pid == 0)
+	signal(SIGQUIT, SIG_DFL);
+	signal(SIGINT, SIG_DFL);
+	if (fd_in != STDIN_FILENO)
 	{
-		if (fd_in != STDIN_FILENO)
-		{
-			if (dup2(fd_in, STDIN_FILENO) == -1)
-				exit(1);
-			close(fd_in);
-		}
-		if (cmd->next)
-		{
-			close(fd[0]);
-			if (dup2(fd[1], STDOUT_FILENO) == -1)
-				exit(1);
-			close(fd[1]);
-		}
-		if (apply_redirs(cmd->redirs) < 0)
+		if (dup2(fd_in, STDIN_FILENO) == -1)
 			exit(1);
-		if (is_builtin_child(cmd->argv[0]))
-			exit(exec_builtin_child(cmd, shell));
-		else if (is_builtin_parent(cmd->argv[0]))
-			exit(exec_builtin_parent_pipes(cmd, shell));
-		else
-			exit(exec_external(cmd, shell));
+		close(fd_in);
 	}
-	return (pid);
+	if (cmd->next)
+	{
+		close(fd[0]);
+		if (dup2(fd[1], STDOUT_FILENO) == -1)
+			exit(1);
+		close(fd[1]);
+	}
+	if (apply_redirs(cmd->redirs) < 0)
+		exit(1);
+	if (is_builtin_child(cmd->argv[0]))
+		exit(exec_builtin_child(cmd, shell));
+	else if (is_builtin_parent(cmd->argv[0]))
+		exit(exec_builtin_parent_pipes(cmd, shell));
+	else
+		exit(exec_external(cmd, shell));
+	return (0);
 }
 
-int	wait_children(pid_t last_pid)
+void	handle_pipeline_signal(int status, int signal_happened)
 {
-	int		status;
-	int		exit_code;
-	pid_t	wpid;
+	if ((signal_happened && status == 0) || (signal_happened && status == 130))
+		write(STDOUT_FILENO, "\n", 1);
 
-	exit_code = 1;
-	wpid = waitpid(-1, &status, 0);
-	while (wpid > 0)
+	if (status == 131)
+		write(STDERR_FILENO, "Quit (core dumped)\n", 19);
+}
+
+static int	exec_one_pipeline(t_cmd **cmd, pid_t *pid, int *fd_in,
+		t_shell *shell)
+{
+	int	fd[2];
+
+	if ((*cmd)->next && pipe(fd) == -1)
+		return (perror("pipe"), ERR_PIPE);
+	*pid = fork();
+	if (*pid == -1)
+		return (handle_fork_error());
+	if (*pid == 0)
+		run_pipeline_child(*cmd, *fd_in, fd, shell);
+	if (*fd_in != STDIN_FILENO)
+		close(*fd_in);
+	if ((*cmd)->next)
 	{
-		if (wpid == last_pid)
-		{
-			if (WIFEXITED(status))
-				exit_code = WEXITSTATUS(status);
-			else if (WIFSIGNALED(status))
-				exit_code = 128 + WTERMSIG(status);
-		}
-		wpid = waitpid(-1, &status, 0);
+		close(fd[1]);
+		*fd_in = fd[0];
 	}
-	return (exit_code);
+	*cmd = (*cmd)->next;
+	return (0);
 }
 
 int	exec_pipeline(t_cmd *cmd, t_shell *shell)
 {
 	int		fd_in;
-	int		fd[2];
 	int		status;
 	pid_t	pid;
+	int		signal_happened;
 
 	fd_in = STDIN_FILENO;
 	status = 0;
+	signal_happened = 0;
+	signal(SIGINT, SIG_IGN);
 	while (cmd)
 	{
-		if (cmd->next && pipe(fd) == -1)
-			return (perror("pipe"), 1);
-		pid = spawn_pipeline_child(cmd, fd_in, fd, shell);
-		if (pid == -1)
-			return (perror("fork"), 1);
-		if (fd_in != STDIN_FILENO)
-			close(fd_in);
-		if (cmd->next)
-		{
-			close(fd[1]);
-			fd_in = fd[0];
-		}
-		cmd = cmd->next;
+		if (exec_one_pipeline(&cmd, &pid, &fd_in, shell) != 0)
+			return (status = ERR_PIPE);
 	}
-	status = wait_children(pid);
+	status = wait_children(pid, &signal_happened);
+	signal(SIGINT, handle_sig);
+	handle_pipeline_signal(status, signal_happened);
+	if (status != ERR_NONE)
+		clean_extra_fds();
 	return (status);
 }
