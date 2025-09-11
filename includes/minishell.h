@@ -149,8 +149,10 @@ int		print_error_exp(t_shell *shell, char *arg);
 void	p_error_cd(t_shell *shell, char *s, int type);
 char	*give_env_value(char **env, char *key);
 // heredocs
-char    *check_expand_heredoc(t_redir *r, char *line, t_shell *shell);
+char	*check_expand_heredoc(t_redir *r, char *line, t_shell *shell);
 int		has_heredocs(t_cmd *cmd);
+void	ft_warning_heredoc(char *args);
+int		handle_heredoc_line_end(char *line, char *filename);
 // pipeline
 int		exec_pipeline(t_cmd *cmd, t_shell *shell);
 int		builtin_export_child(char **argv, t_shell *shell);

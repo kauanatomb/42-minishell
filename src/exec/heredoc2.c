@@ -58,3 +58,25 @@ char	*check_expand_heredoc(t_redir *r, char *line, t_shell *shell)
 	}
 	return (free(orig_line), result);
 }
+
+void	ft_warning_heredoc(char *args)
+{
+	write(2, "bash: warning: here-document at line 1 delimited ", 49);
+	write(2, "by end-of-file (wanted `", 24);
+	write(2, args, ft_strlen(args));
+	write(2, "')\n", 3);
+}
+
+int	handle_heredoc_line_end(char *line, char *filename)
+{
+	if (!line || ft_strcmp(line, filename) == 0)
+	{
+		if (!line)
+			ft_warning_heredoc(filename);
+		if (line)
+			free(line);
+		return (1);
+	}
+	else
+		return (0);
+}

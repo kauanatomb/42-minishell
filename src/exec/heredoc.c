@@ -12,26 +12,19 @@
 
 #include "minishell.h"
 
-void	ft_warning_heredoc(char *args)
+static int	handle_fork_error(void)
 {
-	write(2, "bash: warning: here-document at line 1 delimited ", 49);
-	write(2, "by end-of-file (wanted `", 24);
-	write(2, args, ft_strlen(args));
-	write(2, "')\n", 3);
+	signal(SIGINT, handle_sig);
+	perror("fork");
+	clean_extra_fds();
+	return (ERR_FORK);
 }
 
-int	handle_heredoc_line_end(char *line, char *filename)
+static void	handle_heredoc_failure(t_redir *r)
 {
-	if (!line || ft_strcmp(line, filename) == 0)
-	{
-		if (!line)
-			ft_warning_heredoc(filename);
-		if (line)
-			free(line);
-		return (1);
-	}
-	else
-		return (0);
+	write(STDOUT_FILENO, "\n", 1);
+	clean_extra_fds();
+	r->fd = -1;
 }
 
 void	run_heredoc_child(t_redir *r, int pipe_fd, t_shell *shell)
@@ -69,16 +62,19 @@ int	prepare_heredoc_one(t_redir *r, t_shell *shell)
 	signal(SIGINT, SIG_IGN);
 	pid = fork();
 	if (pid == -1)
-		return (signal(SIGINT, handle_sig), perror("fork"), ERR_FORK);
+		return (handle_fork_error());
 	if (pid == 0)
 		run_heredoc_child(r, pipe_fd[1], shell);
 	close(pipe_fd[1]);
 	status = wait_children(pid);
-	if (status)
-		write(STDOUT_FILENO, "\n", 1);
 	signal(SIGINT, handle_sig);
-	r->fd = pipe_fd[0];
-	r->type = INPUT;
+	if (status != ERR_NONE)
+		handle_heredoc_failure(r);
+	else
+	{
+		r->fd = pipe_fd[0];
+		r->type = INPUT;
+	}
 	return (status);
 }
 
