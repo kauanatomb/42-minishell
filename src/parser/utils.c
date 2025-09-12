@@ -42,19 +42,19 @@ void	print_parse_error(t_error code, t_token *token)
 {
 	if (code == ERR_UNEXPECTED_TOKEN && token)
 	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
+		ft_putstr_fd("bash: syntax error near unexpected token `", 2);
 		ft_putstr_fd(token->value, 2);
 		ft_putstr_fd("'\n", 2);
 	}
 	else if (code == ERR_MISS_FILENAME)
 	{
-		ft_putstr_fd("minishell: syntax error near unexpected ", 2);
+		ft_putstr_fd("bash: syntax error near unexpected ", 2);
 		ft_putstr_fd("token `newline'\n", 2);
 	}
 	else if (code == ERR_MEMORY)
-		ft_putstr_fd("minishell: memory allocation error\n", 2);
+		ft_putstr_fd("bash: memory allocation error\n", 2);
 	else if (code == ERR_PARSE)
-		ft_putstr_fd("minishell: parse error\n", 2);
+		ft_putstr_fd("bash: parse error\n", 2);
 }
 
 int	countword(t_shell *shell, int start)

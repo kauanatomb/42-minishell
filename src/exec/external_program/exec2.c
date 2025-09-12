@@ -23,7 +23,7 @@ int	is_directory(const char *path)
 
 void	exit_command_not_found(char *cmd)
 {
-	ft_putstr_fd("minishell: ", 2);
+	ft_putstr_fd("bash: ", 2);
 	ft_putstr_fd(cmd, 2);
 	ft_putstr_fd(": command not found\n", 2);
 	exit(127);
@@ -31,7 +31,7 @@ void	exit_command_not_found(char *cmd)
 
 void	exit_is_directory(char *path)
 {
-	ft_putstr_fd("minishell: ", 2);
+	ft_putstr_fd("bash: ", 2);
 	ft_putstr_fd(path, 2);
 	ft_putstr_fd(": Is a directory\n", 2);
 	exit(126);

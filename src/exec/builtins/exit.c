@@ -60,13 +60,13 @@ void	builtin_exit(char **argv, t_shell *shell)
 		code = shell->error;
 	else if (argv[2])
 	{
-		write(2, "minishell: exit: too many arguments\n", 36);
+		write(2, "bash: exit: too many arguments\n", 36);
 		shell->error = 1;
 		return ;
 	}
 	else if (parse_exit_code(argv[1], &code))
 	{
-		write(2, "minishell: exit: ", 17);
+		write(2, "bash: exit: ", 17);
 		write(2, argv[1], ft_strlen(argv[1]));
 		write(2, ": numeric argument required\n", 28);
 		code = 2;
@@ -84,12 +84,12 @@ void	builtin_exit_child(char **argv, t_shell *shell)
 		code = shell->error;
 	else if (argv[2])
 	{
-		write(2, "minishell: exit: too many arguments\n", 36);
+		write(2, "bash: exit: too many arguments\n", 36);
 		exit(1);
 	}
 	else if (parse_exit_code(argv[1], &code))
 	{
-		write(2, "minishell: exit: ", 17);
+		write(2, "bash: exit: ", 17);
 		write(2, argv[1], ft_strlen(argv[1]));
 		write(2, ": numeric argument required\n", 28);
 		exit(2);
