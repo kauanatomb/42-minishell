@@ -36,3 +36,27 @@ void	exit_is_directory(char *path)
 	ft_putstr_fd(": Is a directory\n", 2);
 	exit(126);
 }
+
+void	handle_permission_denied(char *cmd)
+{
+	perror(cmd);
+	exit(126);
+}
+
+void	clean_argv_empty_cmds(t_cmd *cmd)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	j = 0;
+	if (!cmd || !cmd->argv)
+		return ;
+	while (cmd->argv[i])
+	{
+		if (cmd->argv[i][0] != '\0')
+			cmd->argv[j++] = cmd->argv[i];
+		i++;
+	}
+	cmd->argv[j] = NULL;
+}

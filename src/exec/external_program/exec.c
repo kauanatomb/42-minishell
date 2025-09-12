@@ -53,16 +53,25 @@ static char	*search_in_paths(char **paths, char *cmd)
 
 static char	*find_command_path(char *cmd, char **env)
 {
-	char	*path_env;
-	char	**paths;
+	char		*path_env;
+	char		**paths;
+	struct stat	st;
 
 	path_env = get_path_from_env(env);
 	if (!path_env)
 		return (NULL);
 	if (cmd[0] == '/' || cmd[0] == '.')
 	{
-		if (access(cmd, X_OK) == 0)
-			return (ft_strdup(cmd));
+		if (stat(cmd, &st) == 0)
+		{
+			if (S_ISDIR(st.st_mode))
+				return (ft_strdup(cmd));
+			if (access(cmd, X_OK) == 0)
+				return (ft_strdup(cmd));
+			errno = EACCES;
+			return (NULL);
+		}
+		errno = ENOENT;
 		return (NULL);
 	}
 	paths = ft_split(path_env, ':');
@@ -77,9 +86,16 @@ void	exec_external_child(t_cmd *cmd, t_shell *shell)
 	signal(SIGQUIT, SIG_DFL);
 	if (apply_redirs(cmd->redirs) < 0)
 		exit(1);
+	if (!cmd->argv[0] || !cmd->argv[0][0])
+		exit(0);
 	cmd_path = find_command_path(cmd->argv[0], shell->env);
 	if (!cmd_path)
-		exit_command_not_found(cmd->argv[0]);
+	{
+		if (errno == EACCES)
+			handle_permission_denied(cmd->argv[0]);
+		else
+			exit_command_not_found(cmd->argv[0]);
+	}
 	if (is_directory(cmd_path))
 	{
 		exit_is_directory(cmd_path);

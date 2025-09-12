@@ -40,6 +40,8 @@ char	*handle_dollar(char **str, char *result, t_shell *shell, int mode)
 		if (result)
 			(*str)++;
 	}
+	else if (!(ft_isalpha(**str) || **str == '_' ))
+		result = append_char_to_result('$', result);
 	else
 		result = expand_key_var(str, shell, result);
 	return (result);

@@ -85,20 +85,24 @@ int	check_entry(t_shell *shell, char *line)
 int	read_line(t_shell *shell)
 {
 	char	*line;
+	t_cmd	*tmp;
 
 	rl_on_new_line();
 	line = readline("minishell> ");
 	if (!line)
-	{
-		rl_clear_history();
 		exit_ctrld(shell);
-	}
 	if (has_unclosed_quotes(line) || is_line_empty(line))
 		return (free(line), 0);
 	add_history(line);
 	shell->error = check_entry(shell, line);
 	if (shell->error)
 		return (free(line), 0);
+	tmp = shell->cmds;
+	while (tmp)
+	{
+		clean_argv_empty_cmds(tmp);
+		tmp = tmp->next;
+	}
 	exec_cmd(shell->cmds, shell);
 	free_cmd_list(shell->cmds);
 	free_tokens(shell->tokens);

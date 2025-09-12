@@ -50,6 +50,7 @@ void	free_shell_env(char **env)
 
 void	exit_ctrld(t_shell *shell)
 {
+	rl_clear_history();
 	free_shell_env(shell->env);
 	write(STDOUT_FILENO, "exit\n", 5);
 	clean_extra_fds();

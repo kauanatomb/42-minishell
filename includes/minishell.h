@@ -23,6 +23,7 @@
 # include <signal.h>
 # include <sys/wait.h>
 # include <fcntl.h>
+# include <errno.h>
 
 typedef enum e_error
 {
@@ -128,16 +129,18 @@ int		is_builtin_child(char *cmd);
 int		is_builtin_parent(char *cmd);
 int		exec_builtin_child(t_cmd *cmd, t_shell *shell);
 int		prepare_heredocs(t_cmd *cmd, t_shell *shell);
+void	clean_argv_empty_cmds(t_cmd *cmd);
 //External exec
 void	exit_command_not_found(char *cmd);
 void	exit_is_directory(char *path);
 int		is_directory(const char *path);
+void	handle_permission_denied(char *cmd);
 // Builtin
 int		builtin_echo(char **argv);
 int		builtin_unset(char **argv, t_shell *shell);
 int		builtin_export(char **argv, t_shell *shell);
 int		builtin_cd(char **argv, t_shell *shell);
-void	builtin_exit(char **argv, t_shell *shell);
+int		builtin_exit(char **argv, t_shell *shell);
 int		builtin_pwd(t_shell *shell);
 int		builtin_env(char **env);
 // utils

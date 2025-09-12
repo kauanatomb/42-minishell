@@ -20,7 +20,7 @@ int	exec_builtin_parent(t_cmd *cmd, t_shell *shell)
 	if (!ft_strcmp(name, "cd"))
 		return (builtin_cd(cmd->argv, shell));
 	if (!ft_strcmp(name, "exit"))
-		return (builtin_exit(cmd->argv, shell), 0);
+		return (builtin_exit(cmd->argv, shell));
 	if (!ft_strcmp(name, "export"))
 		return (builtin_export(cmd->argv, shell));
 	if (!ft_strcmp(name, "unset"))

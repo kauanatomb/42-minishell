@@ -22,7 +22,7 @@ int	wait_children(pid_t last_pid, int *signal_happened)
 	wpid = waitpid(-1, &status, 0);
 	while (wpid > 0)
 	{
-		if (WIFEXITED(status))
+		if (WIFEXITED(status) && last_pid == wpid)
 			exit_code = WEXITSTATUS(status);
 		else if (WIFSIGNALED(status))
 		{
@@ -32,5 +32,7 @@ int	wait_children(pid_t last_pid, int *signal_happened)
 		}
 		wpid = waitpid(-1, &status, 0);
 	}
+	if (exit_code == 141)
+		exit_code = 1;
 	return (exit_code);
 }
