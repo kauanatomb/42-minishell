@@ -38,17 +38,9 @@ int	builtin_echo(char **argv)
 
 int	builtin_pwd(t_shell *shell)
 {
-	char	*pwd;
 	char	*cwd;
 	char	buf[1024];
 
-	pwd = getenv("PWD");
-	if (pwd)
-	{
-		write(STDOUT_FILENO, pwd, ft_strlen(pwd));
-		write(STDOUT_FILENO, "\n", 1);
-		return (0);
-	}
 	cwd = getcwd(buf, sizeof(buf));
 	if (!cwd)
 	{
