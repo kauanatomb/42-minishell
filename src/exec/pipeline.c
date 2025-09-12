@@ -70,7 +70,7 @@ static int	exec_one_pipeline(t_cmd **cmd, pid_t *pid, int *fd_in,
 	int	fd[2];
 
 	if ((*cmd)->next && pipe(fd) == -1)
-		return (perror("pipe"), ERR_PIPE);
+		return (perror("pipe"), signal(SIGINT, handle_sig), ERR_PIPE);
 	*pid = fork();
 	if (*pid == -1)
 		return (handle_fork_error());

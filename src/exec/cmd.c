@@ -61,7 +61,7 @@ int	fork_and_exec_builtin(t_cmd *cmd, t_shell *shell)
 
 	pid = fork();
 	if (pid == -1)
-		return (perror("fork"), -1);
+		return (perror("fork"), ERR_FORK);
 	if (pid == 0)
 	{
 		if (apply_redirs(cmd->redirs) < 0)

@@ -102,7 +102,7 @@ int	exec_external(t_cmd *cmd, t_shell *shell)
 	pid = fork();
 	status = 1;
 	if (pid == -1)
-		return (perror("fork"), status);
+		return (perror("fork"), signal(SIGINT, handle_sig), ERR_FORK);
 	if (pid == 0)
 		exec_external_child(cmd, shell);
 	status = wait_children(pid, &signal_happened);
