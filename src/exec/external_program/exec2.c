@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipeline2.c                                        :+:      :+:    :+:   */
+/*   exec2.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ktombola <ktombola@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,25 +12,27 @@
 
 #include "minishell.h"
 
-int	wait_children(pid_t last_pid, int *signal_happened)
+int	is_directory(const char *path)
 {
-	int		status;
-	int		exit_code;
-	pid_t	wpid;
+	struct stat	st;
 
-	exit_code = 1;
-	wpid = waitpid(-1, &status, 0);
-	while (wpid > 0)
-	{
-		if (WIFEXITED(status))
-			exit_code = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status))
-		{
-			if (last_pid == wpid)
-				exit_code = 128 + WTERMSIG(status);
-			*signal_happened = 1;
-		}
-		wpid = waitpid(-1, &status, 0);
-	}
-	return (exit_code);
+	if (stat(path, &st) == 0 && S_ISDIR(st.st_mode))
+		return (1);
+	return (0);
+}
+
+void	exit_command_not_found(char *cmd)
+{
+	ft_putstr_fd("minishell: ", 2);
+	ft_putstr_fd(cmd, 2);
+	ft_putstr_fd(": command not found\n", 2);
+	exit(127);
+}
+
+void	exit_is_directory(char *path)
+{
+	ft_putstr_fd("minishell: ", 2);
+	ft_putstr_fd(path, 2);
+	ft_putstr_fd(": Is a directory\n", 2);
+	exit(126);
 }

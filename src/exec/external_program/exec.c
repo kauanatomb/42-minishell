@@ -69,7 +69,7 @@ static char	*find_command_path(char *cmd, char **env)
 	return (search_in_paths(paths, cmd));
 }
 
-static void	exec_external_child(t_cmd *cmd, t_shell *shell)
+void	exec_external_child(t_cmd *cmd, t_shell *shell)
 {
 	char	*cmd_path;
 
@@ -79,11 +79,11 @@ static void	exec_external_child(t_cmd *cmd, t_shell *shell)
 		exit(1);
 	cmd_path = find_command_path(cmd->argv[0], shell->env);
 	if (!cmd_path)
+		exit_command_not_found(cmd->argv[0]);
+	if (is_directory(cmd_path))
 	{
-		ft_putstr_fd("minishell: ", 2);
-		ft_putstr_fd(cmd->argv[0], 2);
-		ft_putstr_fd(": command not found\n", 2);
-		exit(127);
+		exit_is_directory(cmd_path);
+		free(cmd_path);
 	}
 	execve(cmd_path, cmd->argv, shell->env);
 	perror(cmd_path);

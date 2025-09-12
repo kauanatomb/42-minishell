@@ -60,7 +60,6 @@ void	handle_pipeline_signal(int status, int signal_happened)
 {
 	if ((signal_happened && status == 0) || (signal_happened && status == 130))
 		write(STDOUT_FILENO, "\n", 1);
-
 	if (status == 131)
 		write(STDERR_FILENO, "Quit (core dumped)\n", 19);
 }

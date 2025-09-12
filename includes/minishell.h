@@ -128,6 +128,10 @@ int		is_builtin_child(char *cmd);
 int		is_builtin_parent(char *cmd);
 int		exec_builtin_child(t_cmd *cmd, t_shell *shell);
 int		prepare_heredocs(t_cmd *cmd, t_shell *shell);
+//External exec
+void	exit_command_not_found(char *cmd);
+void	exit_is_directory(char *path);
+int		is_directory(const char *path);
 // Builtin
 int		builtin_echo(char **argv);
 int		builtin_unset(char **argv, t_shell *shell);
