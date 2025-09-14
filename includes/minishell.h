@@ -24,6 +24,8 @@
 # include <sys/wait.h>
 # include <fcntl.h>
 # include <errno.h>
+# include <sys/ioctl.h>
+# include <termios.h>
 
 typedef enum e_error
 {

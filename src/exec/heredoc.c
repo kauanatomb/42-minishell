@@ -20,63 +20,57 @@ int	handle_fork_error(void)
 	return (ERR_FORK);
 }
 
-static void	handle_heredoc_failure(t_redir *r)
+void	handle_signal_heredoc(int sig)
 {
-	write(STDOUT_FILENO, "\n", 1);
-	clean_extra_fds();
-	r->fd = -1;
+	g_signal = 128 + sig;
+	ioctl(STDIN_FILENO, TIOCSTI, "\n");
 }
 
-void	run_heredoc_child(t_redir *r, int pipe_fd, t_shell *shell)
+static int	read_heredoc_to_pipe(int write_fd, t_redir *r, t_shell *shell)
 {
 	char	*line;
 
-	signal(SIGINT, SIG_DFL);
+	g_signal = 0;
+	signal(SIGINT, handle_signal_heredoc);
 	while (1)
 	{
 		line = readline("> ");
+		if (g_signal == 130)
+			return (free(line), close(write_fd), 130);
 		if (handle_heredoc_line_end(line, r->filename))
 			break ;
 		line = check_expand_heredoc(r, line, shell);
 		if (!line)
 		{
-			close(pipe_fd);
-			exit(ERR_MEMORY);
+			close(write_fd);
+			return (ERR_MEMORY);
 		}
-		write(pipe_fd, line, ft_strlen(line));
-		write(pipe_fd, "\n", 1);
+		write(write_fd, line, ft_strlen(line));
+		write(write_fd, "\n", 1);
 		free(line);
 	}
-	close(pipe_fd);
-	exit(0);
+	close(write_fd);
+	signal(SIGINT, handle_sig);
+	return (0);
 }
 
 int	prepare_heredoc_one(t_redir *r, t_shell *shell)
 {
-	int		pipe_fd[2];
-	pid_t	pid;
-	int		status;
-	int		i;
+	int	pipe_fd[2];
+	int	ret;
 
 	if (pipe(pipe_fd) == -1)
 		return (perror("pipe"), ERR_PIPE);
-	signal(SIGINT, SIG_IGN);
-	pid = fork();
-	if (pid == -1)
-		return (handle_fork_error());
-	if (pid == 0)
-		run_heredoc_child(r, pipe_fd[1], shell);
+	ret = read_heredoc_to_pipe(pipe_fd[1], r, shell);
 	close(pipe_fd[1]);
-	status = wait_children(pid, &i);
-	signal(SIGINT, handle_sig);
-	if (status != ERR_NONE)
-		handle_heredoc_failure(r);
-	else
+	if (ret != 0)
 	{
-		r->fd = pipe_fd[0];
-		r->type = INPUT;
+		close(pipe_fd[0]);
+		return (ret);
 	}
-	return (status);
+	r->fd = pipe_fd[0];
+	r->type = INPUT;
+	return (0);
 }
 
 int	prepare_heredocs(t_cmd *cmd, t_shell *shell)
