@@ -123,7 +123,7 @@ char	*handle_dollar(char **str, char *result, t_shell *shell, int mode);
 char	*append_and_check(char c, char *result);
 // Execution
 void	exec_cmd(t_cmd *cmd, t_shell *shell);
-int		apply_redirs(t_redir *redirs, t_shell *shell);
+int		apply_redirs_child(t_redir *redirs, t_shell *shell);
 int		exec_external(t_cmd *cmd, t_shell *shell);
 int		is_builtin_child(char *cmd);
 int		is_builtin_parent(char *cmd);
@@ -131,6 +131,7 @@ int		exec_builtin_child(t_cmd *cmd, t_shell *shell);
 int		prepare_heredocs(t_cmd *cmd, t_shell *shell);
 void	clean_argv_empty_cmds(t_cmd *cmd);
 void	free_program(t_shell *shell);
+int		apply_redirs(t_redir *r);
 //External exec
 void	exit_command_not_found(char *cmd, t_shell *shell);
 void	exit_is_directory(char *path, t_shell *shell);

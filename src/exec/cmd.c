@@ -44,12 +44,16 @@ int	exec_builtin_child(t_cmd *cmd, t_shell *shell)
 
 int	is_builtin_parent(char *cmd)
 {
+	if (!cmd)
+		return (0);
 	return (!ft_strcmp(cmd, "cd") || !ft_strcmp(cmd, "exit")
 		|| !ft_strcmp(cmd, "export") || !ft_strcmp(cmd, "unset"));
 }
 
 int	is_builtin_child(char *cmd)
 {
+	if (!cmd)
+		return (0);
 	return (!ft_strcmp(cmd, "echo") || !ft_strcmp(cmd, "pwd")
 		|| !ft_strcmp(cmd, "env"));
 }
@@ -65,7 +69,7 @@ int	fork_and_exec_builtin(t_cmd *cmd, t_shell *shell)
 		return (perror("fork"), ERR_FORK);
 	if (pid == 0)
 	{
-		if (apply_redirs(cmd->redirs, shell) < 0)
+		if (apply_redirs_child(cmd->redirs, shell) < 0)
 			exit (1);
 		ret = exec_builtin_child(cmd, shell);
 		free_program(shell);
@@ -77,31 +81,34 @@ int	fork_and_exec_builtin(t_cmd *cmd, t_shell *shell)
 	return (status);
 }
 
-void	exec_cmd(t_cmd *cmd, t_shell *shell)
+void exec_cmd(t_cmd *cmd, t_shell *shell)
 {
-	if (!cmd || !cmd->argv || !cmd->argv[0])
-		return ;
-	if (has_heredocs(cmd))
+    if (!cmd)
+        return ;
+    if (has_heredocs(cmd))
+    {
+        shell->error = prepare_heredocs(cmd, shell);
+        if (shell->error)
+            return ;
+    }
+	if ((!cmd->argv || !cmd->argv[0]) && cmd->redirs)
 	{
-		shell->error = prepare_heredocs(cmd, shell);
-		if (shell->error)
+		if (apply_redirs(cmd->redirs) != 0)
+		{
+			shell->error = 1;
 			return ;
+		}
 	}
-	if (cmd->next)
-	{
-		shell->error = exec_pipeline(cmd, shell);
-		return ;
-	}
-	if (is_builtin_parent(cmd->argv[0]))
-	{
-		shell->error = exec_builtin_parent(cmd, shell);
-		return ;
-	}
-	if (is_builtin_child(cmd->argv[0]))
-	{
-		shell->error = fork_and_exec_builtin(cmd, shell);
-		return ;
-	}
-	shell->error = exec_external(cmd, shell);
-	g_signal = 0;
+    if (!cmd->argv || !cmd->argv[0])
+        return ;
+    if (cmd->next)
+        shell->error = exec_pipeline(cmd, shell);
+    else if (is_builtin_parent(cmd->argv[0]))
+        shell->error = exec_builtin_parent(cmd, shell);
+    else if (is_builtin_child(cmd->argv[0]))
+        shell->error = fork_and_exec_builtin(cmd, shell);
+    else
+        shell->error = exec_external(cmd, shell);
+    g_signal = 0;
 }
+

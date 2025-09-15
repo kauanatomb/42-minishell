@@ -47,7 +47,7 @@ void	run_pipeline_child(t_cmd *cmd, int fd_in, int fd[2], t_shell *shell)
 			exit(1); // free_program
 		close(fd[1]);
 	}
-	if (apply_redirs(cmd->redirs, shell) < 0)
+	if (apply_redirs_child(cmd->redirs, shell) < 0)
 		exit(1);
 	if (is_builtin_child(cmd->argv[0]))
 		ret = exec_builtin_child(cmd, shell);

@@ -20,7 +20,7 @@ int	get_input_fd(t_redir *redirs)
 		return (open(redirs->filename, O_RDONLY));
 }
 
-int	apply_redirs(t_redir *redirs, t_shell *shell)
+int	apply_redirs_child(t_redir *redirs, t_shell *shell)
 {
 	int	fd;
 
@@ -44,4 +44,25 @@ int	apply_redirs(t_redir *redirs, t_shell *shell)
 		redirs = redirs->next;
 	}
 	return (0);
+}
+
+int	apply_redirs(t_redir *r)
+{
+    while (r)
+    {
+        if (r->type == OUTPUT)
+            close(open(r->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644));
+        else if (r->type == APPEND)
+            close(open(r->filename, O_WRONLY | O_CREAT | O_APPEND, 0644));
+        else if (r->type == INPUT)
+        {
+            int fd = open(r->filename, O_RDONLY);
+            if (fd < 0)
+                return (perror(r->filename), 1);
+            else
+                close(fd);
+        }
+        r = r->next;
+    }
+    return (0);
 }

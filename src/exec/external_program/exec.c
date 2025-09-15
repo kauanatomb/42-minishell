@@ -89,7 +89,7 @@ void	exec_external_child(t_cmd *cmd, t_shell *shell)
 		free_program(shell);
 		exit(0);
 	}
-	if (apply_redirs(cmd->redirs, shell) < 0)
+	if (apply_redirs_child(cmd->redirs, shell) < 0)
 		exit(1);
 	cmd_path = find_command_path(cmd->argv[0], shell->env);
 	if (!cmd_path)
