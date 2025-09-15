@@ -28,25 +28,30 @@ int	exec_builtin_parent_pipes(t_cmd *cmd, t_shell *shell)
 	return (1);
 }
 
-void	run_pipeline_child(t_cmd *cmd, int fd_in, int fd[2], t_shell *shell)
+static void	setup_child_fds(int fd_in, int fd[2], t_cmd *cmd, t_shell *shell)
 {
-	int	ret;
-
-	signal(SIGQUIT, SIG_DFL);
-	signal(SIGINT, SIG_DFL);
 	if (fd_in != STDIN_FILENO)
 	{
 		if (dup2(fd_in, STDIN_FILENO) == -1)
-			exit(1); // free_program
+			exit_child_error(shell, "dup2", 1);
 		close(fd_in);
 	}
 	if (cmd->next)
 	{
 		close(fd[0]);
 		if (dup2(fd[1], STDOUT_FILENO) == -1)
-			exit(1); // free_program
+			exit_child_error(shell, "dup2", 1);
 		close(fd[1]);
 	}
+}
+
+void	run_pipeline_child(t_cmd *cmd, int fd_in, int fd[2], t_shell *shell)
+{
+	int	ret;
+
+	signal(SIGQUIT, SIG_DFL);
+	signal(SIGINT, SIG_DFL);
+	setup_child_fds(fd_in, fd, cmd, shell);
 	if (apply_redirs_child(cmd->redirs, shell) < 0)
 		exit(1);
 	if (is_builtin_child(cmd->argv[0]))
@@ -57,14 +62,6 @@ void	run_pipeline_child(t_cmd *cmd, int fd_in, int fd[2], t_shell *shell)
 		ret = exec_external(cmd, shell);
 	free_program(shell);
 	exit(ret);
-}
-
-void	handle_pipeline_signal(int status, int signal_happened)
-{
-	if ((signal_happened && status == 0) || (signal_happened && status == 130))
-		write(STDOUT_FILENO, "\n", 1);
-	if (status == 131)
-		write(STDERR_FILENO, "Quit (core dumped)\n", 19);
 }
 
 static int	exec_one_pipeline(t_cmd **cmd, pid_t *pid, int *fd_in,

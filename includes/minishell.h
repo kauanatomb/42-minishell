@@ -175,6 +175,7 @@ int		builtin_unset_child(char **argv, t_shell *shell);
 void	builtin_exit_child(char **argv, t_shell *shell);
 int		wait_children(pid_t last_pid, int *signal_happened);
 void	handle_pipeline_signal(int status, int signal_happened);
+void	exit_child_error(t_shell *shell, const char *msg, int code);
 
 // Global
 extern volatile sig_atomic_t	g_signal;

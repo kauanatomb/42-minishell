@@ -36,3 +36,19 @@ int	wait_children(pid_t last_pid, int *signal_happened)
 		exit_code = 1;
 	return (exit_code);
 }
+
+void	exit_child_error(t_shell *shell, const char *msg, int code)
+{
+	if (msg)
+		perror(msg);
+	free_program(shell);
+	exit(code);
+}
+
+void	handle_pipeline_signal(int status, int signal_happened)
+{
+	if ((signal_happened && status == 0) || (signal_happened && status == 130))
+		write(STDOUT_FILENO, "\n", 1);
+	if (status == 131)
+		write(STDERR_FILENO, "Quit (core dumped)\n", 19);
+}

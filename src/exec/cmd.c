@@ -43,20 +43,21 @@ static int	dispatch_cmd(t_cmd *cmd, t_shell *shell)
 static int	prepare_cmd(t_cmd *cmd, t_shell *shell)
 {
 	if (!cmd)
-		return (1);
+		return (-1);
 	if (has_heredocs(cmd))
 	{
 		shell->error = prepare_heredocs(cmd, shell);
 		if (shell->error)
-			return (1);
+			return (-1);
 	}
 	if ((!cmd->argv || !cmd->argv[0]) && cmd->redirs)
 	{
 		if (apply_redirs(cmd->redirs) != 0)
 		{
 			shell->error = 1;
-			return (1);
+			return (-1);
 		}
+		return (1);
 	}
 	if (!cmd->argv || !cmd->argv[0])
 		return (1);
@@ -65,8 +66,12 @@ static int	prepare_cmd(t_cmd *cmd, t_shell *shell)
 
 void	exec_cmd(t_cmd *cmd, t_shell *shell)
 {
-	if (prepare_cmd(cmd, shell))
+	int	prep_status;
+
+	prep_status = prepare_cmd(cmd, shell);
+	if (prep_status == -1)
 		return ;
-	shell->error = dispatch_cmd(cmd, shell);
+	if (prep_status == 0 || cmd->next)
+		shell->error = dispatch_cmd(cmd, shell);
 	g_signal = 0;
 }

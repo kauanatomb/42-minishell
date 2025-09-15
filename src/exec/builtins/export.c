@@ -12,23 +12,6 @@
 
 #include "minishell.h"
 
-int	change_value(char *key, char *value, char **env, int i)
-{
-	char	*new_env;
-	int		len;
-
-	len = ft_strlen(key) + 1 + ft_strlen(value) + 1;
-	new_env = malloc(len);
-	if (!new_env)
-		return (ERR_MEMORY);
-	ft_strlcpy(new_env, key, len);
-	ft_strlcat(new_env, "=", len);
-	ft_strlcat(new_env, value, len);
-	free(env[i]);
-	env[i] = new_env;
-	return (0);
-}
-
 int	print_error_exp(t_shell *shell, char *arg)
 {
 	write(2, "bash: export: `", 15);
@@ -76,37 +59,44 @@ int	builtin_export_print(t_shell *shell)
 	return (0);
 }
 
-int	builtin_export(char **argv, t_shell *shell)
+int	process_export_arg(char *arg, t_shell *shell)
 {
-	int		i;
 	char	**splitted;
 	int		idx;
 
+	splitted = split_key_value_env(arg);
+	if (!splitted)
+		return (ERR_MEMORY);
+	if (!is_valid_key(splitted[0]))
+	{
+		print_error_exp(shell, arg);
+		ft_free_array(splitted);
+		return (0);
+	}
+	idx = is_created(splitted[0], shell->env);
+	if (idx >= 0)
+		change_value(splitted[0], splitted[1], shell->env, idx);
+	else
+	{
+		if (create_env(splitted[0], splitted[1], &shell->env) != 0)
+			return (ft_free_array(splitted), ERR_MEMORY);
+	}
+	ft_free_array(splitted);
+	return (0);
+}
+
+int	builtin_export(char **argv, t_shell *shell)
+{
+	int		i;
+
 	i = 1;
 	shell->error = 0;
-	if (!argv[i] || is_line_empty(argv[1]))
+	if (!argv[i] || is_line_empty(argv[i]))
 		return (builtin_export_print(shell));
 	while (argv[i])
 	{
-		splitted = split_key_value_env(argv[i]);
-		if (!splitted)
+		if (process_export_arg(argv[i], shell) == ERR_MEMORY)
 			return (ERR_MEMORY);
-		if (!is_valid_key(splitted[0]))
-		{
-			print_error_exp(shell, argv[i]);
-			ft_free_array(splitted);
-			i++;
-			continue ;
-		}
-		idx = is_created(splitted[0], shell->env);
-		if (idx >= 0)
-			change_value(splitted[0], splitted[1], shell->env, idx);
-		else
-		{
-			if (create_env(splitted[0], splitted[1], &shell->env) != 0)
-				return (ft_free_array(splitted), ERR_MEMORY);
-		}
-		ft_free_array(splitted);
 		i++;
 	}
 	return (shell->error);
