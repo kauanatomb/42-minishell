@@ -25,7 +25,7 @@ static int	handle_w(t_cmd *cmd, char *word, int *pos, int max_words)
 
 static int	handle_pipe(t_shell *shell, t_cmd **curr, int *start, int i)
 {
-	if (*start == 0 || i + 1 >= shell->num_tokens
+	if ((*start == 0 && !(*curr)->redirs) || i + 1 >= shell->num_tokens
 		|| shell->tokens[i + 1].type == PIPE)
 		return (print_parse_error(ERR_UNEXPECTED_TOKEN, &shell->tokens[i]),
 			ERR_UNEXPECTED_TOKEN);

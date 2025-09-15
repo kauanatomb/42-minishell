@@ -81,16 +81,16 @@ int	fork_and_exec_builtin(t_cmd *cmd, t_shell *shell)
 	return (status);
 }
 
-void exec_cmd(t_cmd *cmd, t_shell *shell)
+void	exec_cmd(t_cmd *cmd, t_shell *shell)
 {
-    if (!cmd)
-        return ;
-    if (has_heredocs(cmd))
-    {
-        shell->error = prepare_heredocs(cmd, shell);
-        if (shell->error)
-            return ;
-    }
+	if (!cmd)
+		return ;
+	if (has_heredocs(cmd))
+	{
+		shell->error = prepare_heredocs(cmd, shell);
+		if (shell->error)
+			return ;
+	}
 	if ((!cmd->argv || !cmd->argv[0]) && cmd->redirs)
 	{
 		if (apply_redirs(cmd->redirs) != 0)
@@ -99,16 +99,15 @@ void exec_cmd(t_cmd *cmd, t_shell *shell)
 			return ;
 		}
 	}
-    if (!cmd->argv || !cmd->argv[0])
-        return ;
-    if (cmd->next)
-        shell->error = exec_pipeline(cmd, shell);
-    else if (is_builtin_parent(cmd->argv[0]))
-        shell->error = exec_builtin_parent(cmd, shell);
-    else if (is_builtin_child(cmd->argv[0]))
-        shell->error = fork_and_exec_builtin(cmd, shell);
-    else
-        shell->error = exec_external(cmd, shell);
-    g_signal = 0;
+	if (!cmd->argv || !cmd->argv[0])
+		return ;
+	if (cmd->next)
+		shell->error = exec_pipeline(cmd, shell);
+	else if (is_builtin_parent(cmd->argv[0]))
+		shell->error = exec_builtin_parent(cmd, shell);
+	else if (is_builtin_child(cmd->argv[0]))
+		shell->error = fork_and_exec_builtin(cmd, shell);
+	else
+		shell->error = exec_external(cmd, shell);
+	g_signal = 0;
 }
-
