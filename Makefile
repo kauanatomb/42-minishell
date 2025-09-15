@@ -16,7 +16,7 @@ SRCS     := src/main/main.c src/main/utils.c src/main/struct.c \
 		   	src/signal/handler.c src/lexer/lexer.c src/lexer/tokenizer.c \
 			src/lexer/utils.c src/parser/parser.c src/parser/utils.c src/parser/utils2.c \
 			src/expandvar/main_expand.c src/expandvar/utils.c \
-			src/expandvar/var_expand.c src/exec/cmd.c \
+			src/expandvar/var_expand.c src/exec/cmd.c src/exec/cmd2.c \
 			src/exec/builtins/external.c src/exec/builtins/cd.c \
 			src/exec/builtins/export.c src/exec/builtins/exit.c \
 			src/exec/builtins/export2.c src/exec/builtins/cd2.c \
@@ -24,6 +24,7 @@ SRCS     := src/main/main.c src/main/utils.c src/main/struct.c \
 			src/exec/external_program/exec.c src/exec/builtins/export3.c \
 			src/exec/heredoc.c src/exec/heredoc2.c \
 			src/exec/pipeline.c src/exec/pipeline2.c src/exec/external_program/exec2.c \
+			src/exec/external_program/exec3.c \
 
 OBJS     := $(SRCS:.c=.o)
 

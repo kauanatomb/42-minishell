@@ -132,7 +132,11 @@ int		prepare_heredocs(t_cmd *cmd, t_shell *shell);
 void	clean_argv_empty_cmds(t_cmd *cmd);
 void	free_program(t_shell *shell);
 int		apply_redirs(t_redir *r);
+int		fork_and_exec_builtin(t_cmd *cmd, t_shell *shell);
+int		exec_builtin_child(t_cmd *cmd, t_shell *shell);
+int		exec_builtin_parent(t_cmd *cmd, t_shell *shell);
 //External exec
+char	*find_command_path(char *cmd, char **env);
 void	exit_command_not_found(char *cmd, t_shell *shell);
 void	exit_is_directory(char *path, t_shell *shell);
 int		is_directory(const char *path);

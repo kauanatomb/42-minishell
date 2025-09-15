@@ -12,55 +12,68 @@
 
 #include "minishell.h"
 
-int	is_directory(const char *path)
-{
-	struct stat	st;
-
-	if (stat(path, &st) == 0 && S_ISDIR(st.st_mode))
-		return (1);
-	return (0);
-}
-
-void	exit_command_not_found(char *cmd, t_shell *shell)
-{
-	ft_putstr_fd("bash: ", 2);
-	ft_putstr_fd(cmd, 2);
-	ft_putstr_fd(": command not found\n", 2);
-	free_program(shell);
-	exit(127);
-}
-
-void	exit_is_directory(char *path, t_shell *shell)
-{
-	ft_putstr_fd("bash: ", 2);
-	ft_putstr_fd(path, 2);
-	ft_putstr_fd(": Is a directory\n", 2);
-	free(path);
-	free_program(shell);
-	exit(126);
-}
-
-void	handle_permission_denied(char *cmd, t_shell *shell)
-{
-	perror(cmd);
-	free_program(shell);
-	exit(126);
-}
-
-void	clean_argv_empty_cmds(t_cmd *cmd)
+char	*get_path_from_env(char **envp)
 {
 	int	i;
-	int	j;
 
 	i = 0;
-	j = 0;
-	if (!cmd || !cmd->argv)
-		return ;
-	while (cmd->argv[i])
+	while (envp[i])
 	{
-		if (cmd->argv[i][0] != '\0')
-			cmd->argv[j++] = cmd->argv[i];
+		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
+			return (envp[i] + 5);
 		i++;
 	}
-	cmd->argv[j] = NULL;
+	return (NULL);
+}
+
+char	*search_in_paths(char **paths, char *cmd)
+{
+	int		i;
+	char	*full_path;
+	char	*tmp;
+
+	i = 0;
+	while (paths[i])
+	{
+		full_path = ft_strjoin(paths[i], "/");
+		tmp = full_path;
+		full_path = ft_strjoin(full_path, cmd);
+		free(tmp);
+		if (access(full_path, X_OK) == 0)
+		{
+			ft_free_array(paths);
+			return (full_path);
+		}
+		free(full_path);
+		i++;
+	}
+	ft_free_array(paths);
+	return (NULL);
+}
+
+char	*find_command_path(char *cmd, char **env)
+{
+	char		*path_env;
+	char		**paths;
+	struct stat	st;
+
+	path_env = get_path_from_env(env);
+	if (!path_env)
+		return (NULL);
+	if (cmd[0] == '/' || cmd[0] == '.')
+	{
+		if (stat(cmd, &st) == 0)
+		{
+			if (S_ISDIR(st.st_mode))
+				return (ft_strdup(cmd));
+			if (access(cmd, X_OK) == 0)
+				return (ft_strdup(cmd));
+			errno = EACCES;
+			return (NULL);
+		}
+		errno = ENOENT;
+		return (NULL);
+	}
+	paths = ft_split(path_env, ':');
+	return (search_in_paths(paths, cmd));
 }
