@@ -84,25 +84,26 @@ void	exec_external_child(t_cmd *cmd, t_shell *shell)
 
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
-	if (apply_redirs(cmd->redirs) < 0)
-		exit(1);
 	if (!cmd->argv[0] || !cmd->argv[0][0])
+	{
+		free_program(shell);
 		exit(0);
+	}
+	if (apply_redirs(cmd->redirs, shell) < 0)
+		exit(1);
 	cmd_path = find_command_path(cmd->argv[0], shell->env);
 	if (!cmd_path)
 	{
 		if (errno == EACCES)
-			handle_permission_denied(cmd->argv[0]);
+			handle_permission_denied(cmd->argv[0], shell);
 		else
-			exit_command_not_found(cmd->argv[0]);
+			exit_command_not_found(cmd->argv[0], shell);
 	}
 	if (is_directory(cmd_path))
-	{
-		exit_is_directory(cmd_path);
-		free(cmd_path);
-	}
+		exit_is_directory(cmd_path, shell);
 	execve(cmd_path, cmd->argv, shell->env);
 	perror(cmd_path);
+	free_program(shell);
 	free(cmd_path);
 	exit(126);
 }

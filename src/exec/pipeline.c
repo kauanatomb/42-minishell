@@ -28,32 +28,35 @@ int	exec_builtin_parent_pipes(t_cmd *cmd, t_shell *shell)
 	return (1);
 }
 
-int	run_pipeline_child(t_cmd *cmd, int fd_in, int fd[2], t_shell *shell)
+void	run_pipeline_child(t_cmd *cmd, int fd_in, int fd[2], t_shell *shell)
 {
+	int	ret;
+
 	signal(SIGQUIT, SIG_DFL);
 	signal(SIGINT, SIG_DFL);
 	if (fd_in != STDIN_FILENO)
 	{
 		if (dup2(fd_in, STDIN_FILENO) == -1)
-			exit(1);
+			exit(1); // free_program
 		close(fd_in);
 	}
 	if (cmd->next)
 	{
 		close(fd[0]);
 		if (dup2(fd[1], STDOUT_FILENO) == -1)
-			exit(1);
+			exit(1); // free_program
 		close(fd[1]);
 	}
-	if (apply_redirs(cmd->redirs) < 0)
+	if (apply_redirs(cmd->redirs, shell) < 0)
 		exit(1);
 	if (is_builtin_child(cmd->argv[0]))
-		exit(exec_builtin_child(cmd, shell));
+		ret = exec_builtin_child(cmd, shell);
 	else if (is_builtin_parent(cmd->argv[0]))
-		exit(exec_builtin_parent_pipes(cmd, shell));
+		ret = exec_builtin_parent_pipes(cmd, shell);
 	else
-		exit(exec_external(cmd, shell));
-	return (0);
+		ret = exec_external(cmd, shell);
+	free_program(shell);
+	exit(ret);
 }
 
 void	handle_pipeline_signal(int status, int signal_happened)

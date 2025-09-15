@@ -20,7 +20,7 @@ int	get_input_fd(t_redir *redirs)
 		return (open(redirs->filename, O_RDONLY));
 }
 
-int	apply_redirs(t_redir *redirs)
+int	apply_redirs(t_redir *redirs, t_shell *shell)
 {
 	int	fd;
 
@@ -35,7 +35,7 @@ int	apply_redirs(t_redir *redirs)
 		else
 			return (1);
 		if (fd < 0)
-			return (perror(redirs->filename), -1);
+			return (perror(redirs->filename), free_program(shell), -1);
 		if (redirs->type == INPUT)
 			dup2(fd, STDIN_FILENO);
 		else

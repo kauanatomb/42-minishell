@@ -24,8 +24,6 @@
 # include <sys/wait.h>
 # include <fcntl.h>
 # include <errno.h>
-# include <sys/ioctl.h>
-# include <termios.h>
 
 typedef enum e_error
 {
@@ -125,18 +123,19 @@ char	*handle_dollar(char **str, char *result, t_shell *shell, int mode);
 char	*append_and_check(char c, char *result);
 // Execution
 void	exec_cmd(t_cmd *cmd, t_shell *shell);
-int		apply_redirs(t_redir *redirs);
+int		apply_redirs(t_redir *redirs, t_shell *shell);
 int		exec_external(t_cmd *cmd, t_shell *shell);
 int		is_builtin_child(char *cmd);
 int		is_builtin_parent(char *cmd);
 int		exec_builtin_child(t_cmd *cmd, t_shell *shell);
 int		prepare_heredocs(t_cmd *cmd, t_shell *shell);
 void	clean_argv_empty_cmds(t_cmd *cmd);
+void	free_program(t_shell *shell);
 //External exec
-void	exit_command_not_found(char *cmd);
-void	exit_is_directory(char *path);
+void	exit_command_not_found(char *cmd, t_shell *shell);
+void	exit_is_directory(char *path, t_shell *shell);
 int		is_directory(const char *path);
-void	handle_permission_denied(char *cmd);
+void	handle_permission_denied(char *cmd, t_shell *shell);
 // Builtin
 int		builtin_echo(char **argv);
 int		builtin_unset(char **argv, t_shell *shell);

@@ -58,15 +58,18 @@ int	fork_and_exec_builtin(t_cmd *cmd, t_shell *shell)
 {
 	pid_t	pid;
 	int		status;
+	int		ret;
 
 	pid = fork();
 	if (pid == -1)
 		return (perror("fork"), ERR_FORK);
 	if (pid == 0)
 	{
-		if (apply_redirs(cmd->redirs) < 0)
+		if (apply_redirs(cmd->redirs, shell) < 0)
 			exit (1);
-		exit(exec_builtin_child(cmd, shell));
+		ret = exec_builtin_child(cmd, shell);
+		free_program(shell);
+		exit(ret);
 	}
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))

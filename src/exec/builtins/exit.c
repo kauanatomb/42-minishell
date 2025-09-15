@@ -40,7 +40,7 @@ static int	parse_exit_code(const char *s, long long *code)
 	return (0);
 }
 
-static void	free_program(t_shell *shell)
+void	free_program(t_shell *shell)
 {
 	if (shell->env)
 		free_shell_env(shell->env);

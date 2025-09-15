@@ -21,25 +21,29 @@ int	is_directory(const char *path)
 	return (0);
 }
 
-void	exit_command_not_found(char *cmd)
+void	exit_command_not_found(char *cmd, t_shell *shell)
 {
 	ft_putstr_fd("bash: ", 2);
 	ft_putstr_fd(cmd, 2);
 	ft_putstr_fd(": command not found\n", 2);
+	free_program(shell);
 	exit(127);
 }
 
-void	exit_is_directory(char *path)
+void	exit_is_directory(char *path, t_shell *shell)
 {
 	ft_putstr_fd("bash: ", 2);
 	ft_putstr_fd(path, 2);
 	ft_putstr_fd(": Is a directory\n", 2);
+	free(path);
+	free_program(shell);
 	exit(126);
 }
 
-void	handle_permission_denied(char *cmd)
+void	handle_permission_denied(char *cmd, t_shell *shell)
 {
 	perror(cmd);
+	free_program(shell);
 	exit(126);
 }
 

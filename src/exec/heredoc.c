@@ -23,7 +23,10 @@ int	handle_fork_error(void)
 void	handle_signal_heredoc(int sig)
 {
 	g_signal = 128 + sig;
-	ioctl(STDIN_FILENO, TIOCSTI, "\n");
+	write(STDIN_FILENO, "\n", 1);
+	rl_replace_line("", 0);
+	rl_on_new_line();
+	close(STDIN_FILENO);
 }
 
 static int	read_heredoc_to_pipe(int write_fd, t_redir *r, t_shell *shell)
@@ -58,14 +61,19 @@ int	prepare_heredoc_one(t_redir *r, t_shell *shell)
 {
 	int	pipe_fd[2];
 	int	ret;
+	int	saved_stdin;
 
+	saved_stdin = dup(STDIN_FILENO);
 	if (pipe(pipe_fd) == -1)
 		return (perror("pipe"), ERR_PIPE);
 	ret = read_heredoc_to_pipe(pipe_fd[1], r, shell);
 	close(pipe_fd[1]);
 	if (ret != 0)
 	{
-		close(pipe_fd[0]);
+		if (g_signal == 130)
+			dup2(saved_stdin, STDIN_FILENO);
+		close(saved_stdin);
+		clean_extra_fds();
 		return (ret);
 	}
 	r->fd = pipe_fd[0];

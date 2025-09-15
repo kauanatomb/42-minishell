@@ -43,9 +43,9 @@ int	builtin_cd_child(char **args, t_shell *shell)
 		return (p_error_cd(shell, args[1], 1), free(target), 1);
 	access = check_directory_access(target);
 	if (access == 1)
-		return (p_error_cd(shell, target, 3), 1);
+		return (p_error_cd(shell, target, 3), free(target), 1);
 	else if (access == 2)
-		return (p_error_cd(shell, target, 4), 1);
+		return (p_error_cd(shell, target, 4), free(target), 1);
 	free(target);
 	return (0);
 }
