@@ -30,21 +30,21 @@ char	*search_in_paths(char **paths, char *cmd)
 {
 	int		i;
 	char	*full_path;
-	char	*tmp;
+	char	*joined;
 
 	i = 0;
 	while (paths[i])
 	{
 		full_path = ft_strjoin(paths[i], "/");
-		tmp = full_path;
-		full_path = ft_strjoin(full_path, cmd);
-		free(tmp);
-		if (access(full_path, X_OK) == 0)
-		{
-			ft_free_array(paths);
-			return (full_path);
-		}
+		if (!full_path)
+			return (ft_free_array(paths), NULL);
+		joined = ft_strjoin(full_path, cmd);
 		free(full_path);
+		if (!joined)
+			return (ft_free_array(paths), NULL);
+		if (access(joined, X_OK) == 0)
+			return (ft_free_array(paths), joined);
+		free(joined);
 		i++;
 	}
 	ft_free_array(paths);
@@ -75,5 +75,7 @@ char	*find_command_path(char *cmd, char **env)
 		return (NULL);
 	}
 	paths = ft_split(path_env, ':');
+	if (!paths)
+		return (NULL);
 	return (search_in_paths(paths, cmd));
 }
