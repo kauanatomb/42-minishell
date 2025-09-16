@@ -27,14 +27,14 @@
 
 typedef enum e_error
 {
-	ERR_PIPE = -3,
-	ERR_FORK = -2,
+	ERR_EXEC = -5,
+	ERR_PIPE = -4,
+	ERR_FORK = -3,
+	ERR_PARSE = -2,
 	ERR_MEMORY = -1,
-	ERR_NONE,
+	ERR_NONE = 0,
 	ERR_MISS_FILENAME = 2,
 	ERR_UNEXPECTED_TOKEN = 2,
-	ERR_PARSE,
-	ERR_EXEC,
 	ERR_COMM_NOT_FOUND = 127,
 }	t_error;
 
