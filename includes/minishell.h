@@ -129,7 +129,7 @@ int		is_builtin_child(char *cmd);
 int		is_builtin_parent(char *cmd);
 int		exec_builtin_child(t_cmd *cmd, t_shell *shell);
 int		prepare_heredocs(t_cmd *cmd, t_shell *shell);
-void	clean_argv_empty_cmds(t_cmd *cmd);
+void	fix_argv_command(t_cmd *cmd);
 void	free_program(t_shell *shell);
 int		apply_redirs(t_redir *r);
 int		fork_and_exec_builtin(t_cmd *cmd, t_shell *shell);
@@ -169,6 +169,7 @@ int		handle_heredoc_line_end(char *line, char *filename);
 int		handle_fork_error(void);
 // pipeline
 int		exec_pipeline(t_cmd *cmd, t_shell *shell);
+void	exec_external_child(t_cmd *cmd, t_shell *shell);
 int		builtin_export_child(char **argv, t_shell *shell);
 int		builtin_cd_child(char **args, t_shell *shell);
 int		builtin_unset_child(char **argv, t_shell *shell);

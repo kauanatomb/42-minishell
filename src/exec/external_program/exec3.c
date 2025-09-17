@@ -47,20 +47,21 @@ void	handle_permission_denied(char *cmd, t_shell *shell)
 	exit(126);
 }
 
-void	clean_argv_empty_cmds(t_cmd *cmd)
+void	fix_argv_command(t_cmd *cmd)
 {
 	int	i;
-	int	j;
 
-	i = 0;
-	j = 0;
-	if (!cmd || !cmd->argv)
+	if (!cmd || !cmd->argv || !cmd->argv[0])
 		return ;
-	while (cmd->argv[i])
+	if (cmd->argv[0][0] == '\0')
 	{
-		if (cmd->argv[i][0] != '\0')
-			cmd->argv[j++] = cmd->argv[i];
-		i++;
+		free(cmd->argv[0]);
+		i = 0;
+		while (cmd->argv[i])
+		{
+			cmd->argv[i] = cmd->argv[i + 1];
+			i++;
+		}
+		cmd->argv[i] = NULL;
 	}
-	cmd->argv[j] = NULL;
 }

@@ -49,6 +49,7 @@ void	run_pipeline_child(t_cmd *cmd, int fd_in, int fd[2], t_shell *shell)
 {
 	int	ret;
 
+	ret = 0;
 	signal(SIGQUIT, SIG_DFL);
 	signal(SIGINT, SIG_DFL);
 	setup_child_fds(fd_in, fd, cmd, shell);
@@ -59,7 +60,7 @@ void	run_pipeline_child(t_cmd *cmd, int fd_in, int fd[2], t_shell *shell)
 	else if (is_builtin_parent(cmd->argv[0]))
 		ret = exec_builtin_parent_pipes(cmd, shell);
 	else
-		ret = exec_external(cmd, shell);
+		exec_external_child(cmd, shell);
 	free_program(shell);
 	exit(ret);
 }

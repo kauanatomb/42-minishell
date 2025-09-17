@@ -100,7 +100,7 @@ int	read_line(t_shell *shell)
 	tmp = shell->cmds;
 	while (tmp)
 	{
-		clean_argv_empty_cmds(tmp);
+		fix_argv_command(tmp);
 		tmp = tmp->next;
 	}
 	exec_cmd(shell->cmds, shell);
