@@ -39,15 +39,15 @@ static int	read_heredoc_to_pipe(int write_fd, t_redir *r, t_shell *shell)
 	{
 		line = readline("> ");
 		if (g_signal == 130)
+		{
+			signal(SIGINT, handle_sig);
 			return (free(line), close(write_fd), 130);
+		}
 		if (handle_heredoc_line_end(line, r->filename))
-			break ;
+			break ;		
 		line = check_expand_heredoc(r, line, shell);
 		if (!line)
-		{
-			close(write_fd);
-			return (ERR_MEMORY);
-		}
+			return (close(write_fd), signal(SIGINT, handle_sig), ERR_MEMORY);
 		write(write_fd, line, ft_strlen(line));
 		write(write_fd, "\n", 1);
 		free(line);
@@ -63,6 +63,7 @@ int	prepare_heredoc_one(t_redir *r, t_shell *shell)
 	int	ret;
 	int	saved_stdin;
 
+	r->fd = -1;
 	saved_stdin = dup(STDIN_FILENO);
 	if (pipe(pipe_fd) == -1)
 		return (perror("pipe"), ERR_PIPE);
@@ -74,6 +75,7 @@ int	prepare_heredoc_one(t_redir *r, t_shell *shell)
 			dup2(saved_stdin, STDIN_FILENO);
 		close(saved_stdin);
 		clean_extra_fds();
+		close(pipe_fd[0]);
 		return (ret);
 	}
 	r->fd = pipe_fd[0];
