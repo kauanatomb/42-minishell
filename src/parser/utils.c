@@ -85,3 +85,22 @@ t_cmd	*new_cmd(int counted_words)
 	cmd->next = NULL;
 	return (cmd);
 }
+
+t_redir	*init_redir(t_token *redir_tok)
+{
+	t_redir	*redir;
+
+	redir = malloc(sizeof(t_redir));
+	if (!redir)
+		return (NULL);
+	if (redir_tok->type == OUTPUT || redir_tok->type == APPEND)
+		redir->fd = 1;
+	else
+		redir->fd = 0;
+	redir->type = redir_tok->type;
+	redir->heredoc_exp = 0;
+	redir->filename = NULL;
+	redir->delimiter = NULL;
+	redir->next = NULL;
+	return (redir);
+}

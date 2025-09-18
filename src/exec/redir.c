@@ -58,11 +58,14 @@ int	apply_redirs(t_redir *r)
 			close(open(r->filename, O_WRONLY | O_CREAT | O_APPEND, 0644));
 		else if (r->type == INPUT)
 		{
-			fd = open(r->filename, O_RDONLY);
-			if (fd < 0)
-				return (perror(r->filename), 1);
-			else
-				close(fd);
+			if (r->filename)
+			{
+				fd = open(r->filename, O_RDONLY);
+				if (fd < 0)
+					return (perror(r->filename), 1);
+				else
+					close(fd);
+			}
 		}
 		r = r->next;
 	}

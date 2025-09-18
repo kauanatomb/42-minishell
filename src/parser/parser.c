@@ -37,26 +37,19 @@ static int	handle_pipe(t_shell *shell, t_cmd **curr, int *start, int i)
 	return (ERR_NONE);
 }
 
-static int	handle_redir(t_cmd *curr, t_token *redir_tok,
-				t_token *file_tok)
+static int	handle_redir(t_cmd *curr, t_token *redir_tok, t_token *file_tok)
 {
 	t_redir	*redir;
+	int		err;
 
 	if (!file_tok || file_tok->type != WORD)
 		return (print_parse_error(ERR_MISS_FILENAME, NULL), ERR_MISS_FILENAME);
-	redir = malloc(sizeof(t_redir));
+	redir = init_redir(redir_tok);
 	if (!redir)
 		return (print_parse_error(ERR_MEMORY, NULL), ERR_MEMORY);
-	if (redir_tok->type == OUTPUT || redir_tok->type == APPEND)
-		redir->fd = 1;
-	else
-		redir->fd = 0;
-	redir->type = redir_tok->type;
-	redir->heredoc_exp = 0;
-	redir->filename = ft_strdup(file_tok->value);
-	if (!redir->filename)
+	err = set_redir_target(redir, file_tok);
+	if (err != ERR_NONE)
 		return (free(redir), print_parse_error(ERR_MEMORY, NULL), ERR_MEMORY);
-	redir->next = NULL;
 	attach_redir(redir, curr);
 	return (ERR_NONE);
 }

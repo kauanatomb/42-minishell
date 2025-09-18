@@ -38,3 +38,20 @@ void	attach_redir(t_redir *redir, t_cmd *curr)
 		last->next = redir;
 	}
 }
+
+int	set_redir_target(t_redir *redir, t_token *file_tok)
+{
+	if (redir->type != HEREDOC)
+	{
+		redir->filename = ft_strdup(file_tok->value);
+		if (!redir->filename)
+			return (ERR_MEMORY);
+	}
+	else
+	{
+		redir->delimiter = ft_strdup(file_tok->value);
+		if (!redir->delimiter)
+			return (ERR_MEMORY);
+	}
+	return (ERR_NONE);
+}

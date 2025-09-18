@@ -58,6 +58,7 @@ typedef struct s_redir
 {
 	int				fd;
 	char			*filename;
+	char			*delimiter;
 	int				heredoc_exp;
 	t_token_type	type;
 	struct s_redir	*next;
@@ -112,6 +113,8 @@ int		countword(t_shell *shell, int start);
 t_cmd	*new_cmd(int counted_words);
 void	attach_redir(t_redir *redir, t_cmd *curr);
 t_cmd	*get_last_cmd(t_shell *shell);
+t_redir	*init_redir(t_token *redir_tok);
+int		set_redir_target(t_redir *redir, t_token *file_tok);
 
 // Expand var
 int		main_expand(t_shell *shell);

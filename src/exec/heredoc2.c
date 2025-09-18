@@ -67,12 +67,12 @@ void	ft_warning_heredoc(char *args)
 	write(2, "')\n", 3);
 }
 
-int	handle_heredoc_line_end(char *line, char *filename)
+int	handle_heredoc_line_end(char *line, char *delimiter)
 {
-	if (!line || ft_strcmp(line, filename) == 0)
+	if (!line || ft_strcmp(line, delimiter) == 0)
 	{
 		if (!line)
-			ft_warning_heredoc(filename);
+			ft_warning_heredoc(delimiter);
 		if (line)
 			free(line);
 		return (1);

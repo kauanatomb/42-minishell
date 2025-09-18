@@ -43,8 +43,8 @@ static int	read_heredoc_to_pipe(int write_fd, t_redir *r, t_shell *shell)
 			signal(SIGINT, handle_sig);
 			return (free(line), close(write_fd), 130);
 		}
-		if (handle_heredoc_line_end(line, r->filename))
-			break ;		
+		if (handle_heredoc_line_end(line, r->delimiter))
+			break ;
 		line = check_expand_heredoc(r, line, shell);
 		if (!line)
 			return (close(write_fd), signal(SIGINT, handle_sig), ERR_MEMORY);
