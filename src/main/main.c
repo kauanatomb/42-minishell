@@ -116,7 +116,11 @@ int	main(int argc, char *argv[], char *envp[])
 
 	if (argc != 1)
 		return (1);
-	init_shell_env(&shell, envp);
+	if (init_shell_env(&shell, envp))
+	{
+		write(2, "Error: failed to initialize the enviroment\n", 44);
+		return (ERR_MEMORY);
+	}
 	shell.error = 0;
 	signal_receiver();
 	while (1)
