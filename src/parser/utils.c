@@ -29,6 +29,7 @@ void	free_cmd_list(t_cmd *cmds)
 			{
 				next_r = last->next;
 				free(last->filename);
+				free(last->delimiter);
 				free(last);
 				last = next_r;
 			}

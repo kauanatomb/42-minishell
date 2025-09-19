@@ -124,6 +124,9 @@ char	*append_char_to_result(char c, char *result);
 char	*expand_var(char *str, t_shell *shell);
 char	*handle_dollar(char **str, char *result, t_shell *shell, int mode);
 char	*append_and_check(char c, char *result);
+int		expand_delimiter(t_redir *r);
+int		expand_filename(t_redir *r, t_shell *shell);
+char	*expand_heredoc(char *delimiter, t_redir *r);
 // Execution
 void	exec_cmd(t_cmd *cmd, t_shell *shell);
 int		apply_redirs_child(t_redir *redirs, t_shell *shell);

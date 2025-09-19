@@ -15,7 +15,7 @@ NAME    := minishell
 SRCS     := src/main/main.c src/main/utils.c src/main/struct.c \
 		   	src/signal/handler.c src/lexer/lexer.c src/lexer/tokenizer.c \
 			src/lexer/utils.c src/parser/parser.c src/parser/utils.c src/parser/utils2.c \
-			src/expandvar/main_expand.c src/expandvar/utils.c \
+			src/expandvar/main_expand.c src/expandvar/utils.c src/expandvar/utils2.c\
 			src/expandvar/var_expand.c src/exec/cmd.c src/exec/cmd2.c \
 			src/exec/builtins/external.c src/exec/builtins/cd.c \
 			src/exec/builtins/export.c src/exec/builtins/exit.c \
